@@ -1,0 +1,35 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./**/*.{html,js}"],
+  theme: {
+    extend: {},
+    colors: {
+      submitPageColorBorderLowBlack: "#e7eaec",
+      submitPageColorBorderBlue: "#68a5fe",
+      lowGray: "#424750",
+      redColor: "#ec1d37",
+      whiteColor: "#fff",
+      blackColor: "#000",
+      linkColor: "#68a5fe",
+      primary: "#ef4056",
+      inputSearchBar: "#f0f0f1",
+      headerLinksBgColor: "#fde5e8",
+      lowGreenColor: "#28a745",
+      headerNavBgColor: "#f5f5f5",
+      lowOpacityColorBg: "#00000059",
+      pinkRolor: "#f59dff",
+      orangeColor: "#ff7E44",
+      mdGray: "#acacac",
+      lowerGray: "#f0f1f2",
+      lowBlue: "#0275d8",
+      skyColor: "#17a2b8",
+      yellowColor: "#ffff00",
+      skyColor2: "#00bfd6",
+      darkBlueColor: "#117a8b",
+    },
+    container: {
+      center: true,
+    },
+  },
+  plugins: [],
+};

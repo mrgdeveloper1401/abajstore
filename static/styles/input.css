@@ -1,0 +1,625 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    @font-face {
+        font-family: iranYekan;
+        src: url('../assets/fonts/iranyekan-regular.woff2') format('woff2'),
+            url('../assets/fonts/iranyekan-regular.woff2') format('woff2');
+    }
+
+    @font-face {
+        font-family: vazir;
+        src: url('../assets/fonts/VAZIR\ REGULAR.TTF') format('truetype'),
+            url('../assets/fonts/IRANSANS-BOLDEDITORTEAM.TTF') format('truetype');
+    }
+
+    @font-face {
+        font-family: iransans;
+        src: url('../assets/fonts/IRANSANS-BOLDEDITORTEAM.TTF') format('truetype'),
+            url('../assets/fonts/IRANSANS-LIGHT\ EDITORTEAM.TTF') format('truetype'),
+            url('../assets/fonts/IRANSANS-MEDIUM_EDITORTEAM.TTF') format('truetype'),
+            url('../assets/fonts/IRANSANS\ EDITORTEAM.TTF') format('truetype'),
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: iranYekan, vazir, iransans;
+    }
+
+    .container:not(.disableP) {
+        padding-top: 15px;
+        padding-bottom: 15px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .show {
+        display: block !important;
+    }
+
+    .flexShow {
+        display: flex !important;
+    }
+
+    .maxHeight430px {
+        height: 430px;
+    }
+
+    .hideWithTranslateY {
+        transform: translateY(-100%);
+    }
+
+    .headerFormFoucsStyle {
+        background-color: #fff;
+        color: #000;
+        box-shadow: 0 0 10px #ccc;
+    }
+
+    .boxBorder {
+        border: 2px solid #e7eaec;
+    }
+
+    .selectedBeforBorderRight {
+        position: relative;
+    }
+
+    .selectedBeforBorderRight::before {
+        content: "";
+        position: absolute;
+        right: 0;
+        background-color: #ef4056;
+        width: 4px;
+        height: 60%;
+        top: 50%;
+        transform: translateY(-50%);
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+
+    .headerNavHoverStyle {
+        background: #ef4056;
+        color: #fff;
+    }
+
+    .headerAccountUlNav {
+        position: absolute;
+    }
+
+    .headerAccountUlNav li a {
+        transition: all .3s;
+    }
+
+    .headerAccountUlNav>li:first-child {
+        position: relative;
+        z-index: 2;
+        background: #fff;
+        border-radius: 8px;
+    }
+
+    .headerAccountUlNav::after {
+        content: "";
+        position: absolute;
+        top: -9px;
+        left: 11px;
+        width: 20px;
+        height: 20px;
+        rotate: 45deg;
+        background: #fff;
+        box-shadow: 0 0 10px #bbb;
+        z-index: 1;
+    }
+
+    .mainMenuNavBarLink {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mainMenuNavBarLink span.mainMenuNavBarSortsProductTitle {
+        color: #424750;
+    }
+
+    .mainMenuNavBarLink span {
+        padding: 0 16px;
+    }
+
+    .mainMenuNavBarLink>span {
+        padding: 5px 16px;
+        display: block;
+    }
+
+
+
+    .mainMenuNavBarLink span.mainMenuNavBarClickElement {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        cursor: pointer;
+    }
+
+    .mainMenuNavBarLink ul {
+        max-height: 0px;
+        transition: all .5s;
+        padding-right: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow: hidden;
+        cursor: default;
+        transition: all .3s;
+    }
+
+    .mainMenuNavBarLink>ul {
+        background-color: #f0f0f1;
+    }
+
+    .mainMenuNavBarLink>ul.showUl {
+        padding-bottom: 15px;
+    }
+
+    .mainMenuNavBarLink span.showed {
+        color: #ef4056;
+    }
+
+    .mainMenuNavBarLink span i {
+        transition: rotate .3s;
+    }
+
+    .mainMenuNavBarLink span.showed i {
+        color: #000;
+        rotate: 180deg;
+    }
+
+    .mainMenuNavBarLink ul.showUl {
+        max-height: 2000px;
+        padding-top: 15px;
+        transition: max-height 1s;
+    }
+
+    .mainMenuNavBarLink ul.show>li {
+        padding-right: 15px;
+    }
+
+    .sortsTilteLi {
+        color: #424750;
+        padding-right: 15px;
+    }
+
+    #mainMenuNavBarsec:not(.setDisplay) {
+        display: none;
+    }
+
+    #mainMenuNavBarsec:not(.active) {
+        opacity: 0;
+        animation: opacityHide .2s linear;
+    }
+
+    #mainMenuNavBarsec.setDisplay {
+        display: grid;
+    }
+
+    #mainMenuNavBarsec.active {
+        opacity: 1;
+        animation: opacityShow .2s linear;
+    }
+
+    #mainMenuNavBarsec:not(.active)>nav {
+        transform: translateX(100%);
+        animation: translateXHide .3s linear;
+    }
+
+    #mainMenuNavBarsec.active>nav {
+        transform: translateX(0%);
+        animation: translateXShow .3s linear;
+    }
+
+
+    .swiper-button-next,
+    .swiper-button-prev {
+        background: #fff !important;
+        box-shadow: 0 0 10px #00000094 !important;
+        border-radius: 50% !important;
+        width: 40px !important;
+        height: 40px !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .swiper-button-next::after,
+    .swiper-button-prev::after {
+        width: 17px !important;
+        font-size: 25px !important;
+        font-weight: bold !important;
+        color: #000 !important;
+        margin-right: 5px;
+    }
+
+    .liActive {
+        background: #ef4056;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    .noUi-connect {
+        background: #424750;
+    }
+
+    .noUi-horizontal .noUi-handle,
+    .noUi-vertical .noUi-handle {
+        background: #424750;
+    }
+
+    .noUi-target.noUi-horizontal .noUi-tooltip {
+        background-color: #424750;
+    }
+
+
+    .dropDownBtn i {
+        transition: all .3s;
+    }
+
+    .dropDownBtn+div {
+        max-height: 0;
+        overflow: hidden;
+        transition: all .3s;
+    }
+
+    .dropDownBtn.showFilter i {
+        rotate: 180deg;
+    }
+
+    .dropDownBtn.showFilter+div {
+        max-height: 600px;
+        transition: all 1s;
+        padding-top: 10px;
+    }
+
+    .customeCheckbox {
+        width: 45px;
+        height: 12px;
+        padding: 10px 15px;
+        border-radius: 20px;
+        border: 1px solid #424750;
+        position: relative;
+        transition: all .3s;
+        cursor: pointer;
+    }
+
+    .customeCheckbox::after {
+        content: '';
+        width: 18px;
+        height: 90%;
+        border-radius: 50%;
+        background-color: #424750;
+        position: absolute;
+        top: 50%;
+        right: 2px;
+        transition: all .3s;
+        transform: translate(0%, -50%);
+    }
+
+    .customeCheckbox.active::after {
+        transform: translate(-125%, -50%);
+        background-color: #fff;
+    }
+
+    .customeCheckbox.active {
+        background-color: #ef4056;
+        border: 0;
+    }
+
+    .filterContWithAnimate {
+        transition: all .3s;
+        transition-delay: .3s;
+    }
+
+    .filterContWithAnimate form,
+    .filterContWithAnimate div {
+        transition: all .3s;
+    }
+
+    .filterContWithAnimate.showFilterSec form,
+    .filterContWithAnimate.showFilterSec div {
+        opacity: 1;
+        animation: translateYShow .3s linear;
+    }
+
+    .filterContWithAnimate.showFilterSec form,
+    .filterContWithAnimate.showFilterSec div {
+        transform: translateY(0%);
+    }
+
+    .filterContWithAnimate.hideFilterSec {
+        opacity: 0;
+    }
+
+    .filterContWithAnimate.hideFilterSec form,
+    .filterContWithAnimate.hideFilterSec div {
+        transform: translateY(100%);
+    }
+
+    .paginationLiActive a {
+        color: #fff;
+        background: #ef4056;
+    }
+
+    .dotesPagination a:hover {
+        background-color: #fff;
+    }
+
+    .paginationLiActive a:hover {
+        background: #ef4056;
+    }
+
+    .oldPrice {
+        display: flex;
+        gap: 2px;
+    }
+
+    .swiper-button-disabled {
+        visibility: hidden;
+    }
+
+    #scrollTop {
+        display: none;
+    }
+
+    #scrollTop.active {
+        display: flex;
+        opacity: 1;
+        transition: all 0.3s;
+        animation: opacityShow .3s linear;
+    }
+
+    #imagesShow.showImagesShow {
+        display: flex;
+    }
+
+    .payMethodCheckBox {
+        display: block;
+        position: relative;
+        margin-bottom: 12px;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .payMethodCheckBox input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    .checkmark {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 25px;
+        width: 25px;
+        background-color: #eee;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .payMethodCheckBox .dropDownPayMethod {
+        background-color: #e7eaec;
+        height: 0;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 0 10px;
+        transition: height .3s;
+        overflow: hidden;
+        cursor: default;
+    }
+
+    .payMethodCheckBox:hover input~.checkmark {
+        border: 2px solid #ef4056;
+    }
+
+    .payMethodCheckBox input:checked~.checkmark {
+        background-color: #ef4056;
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    .payMethodCheckBox input:checked~.dropDownPayMethod {
+        height: 60px;
+    }
+
+    .payMethodCheckBox input:checked~.checkmark:after {
+        display: block;
+    }
+
+    .payMethodCheckBox input:hover:not(:checked)~.checkmark:after {
+        display: block;
+        border-color: #ef4056;
+    }
+
+    .payMethodCheckBox .checkmark:after {
+        width: 5px;
+        height: 10px;
+        border-style: solid;
+        border-color: white;
+        border-width: 0 3px 3px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
+    .divTextAlert {
+        width: 100%;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+    }
+
+    .danger {
+        background-color: #ef4056;
+        color: #fff;
+    }
+
+    .success {
+        background-color: rgb(75, 170, 75);
+        color: #fff;
+    }
+
+    .warning {
+        background-color: #fff000;
+        color: #000;
+        box-shadow: 0 0 5px #00000056;
+    }
+
+    #selectedLiOptions {
+        max-height: 0;
+        transition: all .5s;
+        overflow: hidden;
+    }
+
+    #selectedLiOptions.showListAddresOption {
+        max-height: 2000px;
+    }
+
+    #showList.none {
+        display: none;
+    }
+
+    .checkOutDaysBaseStyle {
+        @apply flex flex-col items-center px-2 cursor-pointer;
+    }
+
+    .checkOutDaysActive {
+        @apply text-redColor font-bold border-b-redColor border-b-[3px]
+    }
+
+    .checkOutliBaseStyle {
+        @apply rounded flex flex-col items-center py-2 px-5 text-sm border-2 border-[transparent]
+    }
+
+    .checkOutliUnAvi {
+        @apply bg-lowerGray
+    }
+
+    .checkOutliAvi {
+        @apply border-lowerGray cursor-pointer
+    }
+
+    .checkOutliAviActive {
+        @apply border-primary
+    }
+
+    @media screen and (width<500) {
+
+        .swiper-button-prev,
+        .swiper-button-next {
+            display: none !important;
+            z-index: -1 !important;
+            opacity: 0 !important;
+
+        }
+    }
+
+    @keyframes opacityShow {
+        0% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    @keyframes opacityHide {
+        0% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+        }
+    }
+
+
+    @keyframes translateXShow {
+        0% {
+            transform: translateX(100%);
+        }
+
+        100% {
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes translateXHide {
+        0% {
+            transform: translateX(0);
+        }
+
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    @keyframes translateYShow {
+        0% {
+            transform: translateY(100%);
+        }
+
+        100% {
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes translateYHide {
+        0% {
+            transform: translateY(0);
+        }
+
+        100% {
+            transform: translateY(100%);
+        }
+    }
+
+    @keyframes heightShow {
+        0% {
+            max-height: 0px;
+        }
+
+        100% {
+            max-height: 2000px;
+        }
+    }
+
+    @keyframes heightHide {
+        0% {
+            max-height: 2000px;
+        }
+
+        100% {
+            max-height: 0px;
+        }
+    }
+
+    @media screen and (width<500px) {
+        .price {
+            font-size: 12px;
+        }
+    }
+}
