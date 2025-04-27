@@ -1,0 +1,565 @@
+{% load static %}
+
+{% if header_message %}
+<p class="min-h-[50px] flex items-center justify-center warning">{{ header_message }}</p>
+{% endif %}
+
+<header
+      class="w-full top-0 z-10 lg:divide-y-0 divide-y-2 divide-submitPageColorBorderLowBlack"
+    >
+      <section class="bg-whiteColor relative z-10">
+        <div class="container flex justify-between">
+          <div class="lg:flex items-center hidden gap-4">
+            <a href="{% url 'products:home' %}" class="block w-[120px]">
+              <img
+                src="{% static 'assets/images/logo.png' %}"
+                class="w-full"
+                alt="عکس"
+              />
+            </a>
+            <form id="search-form" method="get" action="{% url 'products:product_list' %}"
+              class="bg-inputSearchBar lg:w-[500px] w-[350px] flex items-center"
+            >
+                {% csrf_token %}
+              <button type="submit" class="flex items-center px-2 py-2">
+                <i class="fa fa-search"></i>
+              </button>
+                <label for="search-input"></label><input
+                      value="{{ request.GET.name }}"
+                  id="search-input"
+                class="productName bg-[transparent] w-full px-4 py-2 outline-none rounded-sm"
+                type="text"
+                name="name"
+                placeholder="جستجو"
+              />
+            </form>
+          </div>
+          <button id="openMainMenuNavBar" class="w-[40px] lg:hidden p-1">
+            <svg
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-full"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+            </svg>
+          </button>
+          <a href="{% url 'products:home' %}" class="lg:hidden block w-[120px]">
+            <img src="{% static 'assets/images/logo.png' %}" class="w-full" alt="عکس" />
+          </a>
+        
+        
+            
+        
+          <div
+            class="grid gap-3 grid-cols-[28px] lg:grid-cols-[28px_10px_28px] grid-rows-[28px] content-center "
+          >
+            <div
+              id="accountSetting"
+              class="lg:flex hidden items-center justify-center relative"
+            >
+                {% if request.user.is_authenticated %}
+                
+              <i class="text-[20px] far fa-user"></i>
+              <i class="fa fa-angle-down"></i>
+              <ul
+                id="accountSettingCont"
+                class="headerAccountUlNav hidden absolute divide-y-2 divide-submitPageColorBorderLowBlack cursor-default top-[50px] w-[max-content] rounded-md shadow-md shadow-[#bbb] bg-whiteColor left-0"
+              >
+                <li class="rounded-md">
+                  <a
+                    href="{% url 'auth:profile' %}"
+                    class="w-full hover:bg-submitPageColorBorderLowBlack flex gap-4 items-center px-4 py-4"
+                  >
+                    <img
+                      loading="lazy"
+                      class="w-[32px]"
+                      src="https://www.zagros.market/themes/shop-theme1/images/avatar.svg"
+                      alt="پروفایل"
+                    />
+                    <p>{{ request.user.phone_number }}</p>
+                  </a>
+                </li>
+                  
+                  
+                <li class="">
+                  <a
+                    href="{% url 'carts:all' %}"
+                    class="w-full hover:bg-submitPageColorBorderLowBlack flex gap-4 items-center px-4 py-4"
+                  >
+                  <svg
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    fill="none"
+                      class="size-6"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"></path>
+                  </svg>
+                    <p>سبد خرید</p>
+                  </a>
+                </li>
+                  
+                  
+                <li class="">
+                  <a
+                    href="{% url 'orders:order_list' %}"
+                    class="w-full hover:bg-submitPageColorBorderLowBlack flex gap-4 items-center px-4 py-4"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="size-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"
+                      ></path>
+                    </svg>
+                    <p>سفارش ها</p>
+                  </a>
+                </li>
+                  
+                <li>
+                  <a
+                    href="{% url 'auth:address_list' %}"
+                    class="w-full hover:bg-submitPageColorBorderLowBlack flex gap-4 items-center px-4 py-4"
+                  >
+                      
+                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"></path>
+                </svg>
+                    <p>آدرس های من</p>
+                  </a>
+                </li>
+              
+                <li>
+                  <a
+                    href="{% url 'auth:profile' %}"
+                    class="w-full hover:bg-submitPageColorBorderLowBlack flex gap-4 items-center px-4 py-4"
+                  >
+                    <i class="text-2xl w-[32px] far fa-user"></i>
+
+                    <p>اطلاعات حساب کاربری</p>
+                  </a>
+                </li>
+              
+              
+                <li>
+                    <form class="w-full block hover:bg-submitPageColorBorderLowBlack"
+                            method="post" action="{% url 'auth:logout' %}">
+                        {% csrf_token %}
+                  <button
+                    type="submit"
+                    class="flex gap-4 items-center px-4 py-4"
+                  >
+                    <i class="fa fa-sign-out text-2xl"></i>
+                    <p>خروج</p>
+                  </button>
+                    </form>
+                </li>
+              
+              </ul>
+                {% endif %}
+            </div>
+
+              
+                {% if request.user.is_authenticated %}
+
+            <span
+              class="border-r-2 lg:inline hidden border-submitPageColorBorderLowBlack"
+            >
+            </span>
+            <a href="{% url 'carts:all' %}" class="p-1 block relative">
+              <svg
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="w-full"
+                fill="none"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"></path>
+              </svg>
+              <span
+                class="bg-primary p-1 min-w-[15px] text-[10px] h-[20px] absolute -right-[4px] top-4 text-whiteColor rounded-lg text-center flex items-center justify-center"
+              >
+                {{ cart_counter }}
+              </span>
+            </a>
+          </div>
+    
+        {% endif %}
+        
+
+        </div>
+      
+{% if not request.user.is_authenticated %}
+            <a href="{% url 'auth:login' %}" class="items-center lg:flex hidden text-sm">
+              <span>ورود / ثبت نام</span>
+            </a>
+{% endif %}      
+      
+      
+      </section>
+
+
+
+
+      <section
+        class="bg-lowOpacityColorBg border-none fixed top-0 right-0 z-[11] w-full h-screen grid-rows-1"
+        id="mainMenuNavBarsec"
+      >
+        <nav
+          class="bg-whiteColor max-w-[300px] overflow-y-auto overflow-x-hidden flex flex-col gap-2 divide-y-2 divide-submitPageColorBorderLowBlack"
+        >
+          <ul class="px-4 py-4 flex w-full items-center justify-between">
+            <li>
+              <a class="block" href="{% url 'products:home' %}">
+                <img
+                  class="w-[135px]"
+                  src="{% static 'assets/images/logo.png' %}"
+                  alt="logo"
+                />
+              </a>
+            </li>
+            <li>
+              <button
+                id="closeMainMenuNavBar"
+                class="px-2 py-2 flex items-center justify-between text-lg"
+              >
+                <i class="fa fa-times"></i>
+              </button>
+            </li>
+          </ul>
+          <ul class="flex flex-col gap-5 py-4 text-sm">
+          
+            <li>
+              <a href="{% url 'products:home' %}" class="mainMenuNavBarLink">
+                <span>صفحه اصلی</span>
+              </a>
+            </li>
+          
+            <li>
+              <a href="{% url 'products:product_list' %}" class="mainMenuNavBarLink">
+                <span>فروشگاه</span>
+              </a>
+            </li>
+          
+            <li>
+              <a href="{% url 'carts:all' %}" class="mainMenuNavBarLink">
+                <span>سبد خرید من</span>
+              </a>
+            </li>
+          
+            <li>
+              <a href="{% url 'orders:order_list' %}" class="mainMenuNavBarLink">
+                <span>سفارشات من</span>
+              </a>
+            </li>
+          
+            <li>
+              <a href="{% url 'auth:profile' %}" class="mainMenuNavBarLink">
+                <span>اطلاعات حساب کاربری </span>
+              </a>
+            </li>
+          
+            <li>
+              <a href="{% url 'auth:address_list' %}" class="mainMenuNavBarLink">
+                <span>آدرس های من</span>
+              </a>
+            </li>
+          
+            <li>
+              <a href="#" class="mainMenuNavBarLink">
+                <span>درباره ما</span>
+              </a>
+            </li>
+          
+            <li>
+              <a href="#" class="mainMenuNavBarLink">
+                <span>تماس با ما</span>
+              </a>
+            </li>
+          
+            <li>
+              <form class="mainMenuNavBarLink px-4" method="post" action="{% url 'auth:logout' %}">
+                  {% csrf_token %}
+                <button
+                  type="submit"
+                  class="text-redColor flex justify-between items-center w-full"
+                >
+                  <span class="px-[0_!important]">خروج</span>
+                  <i class="fa fa-sign-out text-2xl"></i>
+                </button>
+              </form>
+            </li>
+          
+          
+            <li>
+              <a href="#" class="mainMenuNavBarLink">
+                <span>دسته بندی کالاها</span>
+              </a>
+            </li>
+          
+          
+          
+          
+              {% for category, s_category in all_categories.items %}
+            <li>
+              <div class="mainMenuNavBarLink">
+                <span class="mainMenuNavBarClickElement"
+                  >{{ category.name }}
+                  <i class="fa fas fa-angle-down"></i>
+                </span>
+                <ul>
+                
+                  <li class="sortsTilteLi">
+                    <a href="{% url 'products:product_list' %}?category={{ category.name }}">همه ی موارد این دسته</a>
+                  </li>
+                    
+                        {% for s_cat in s_category %}
+                  
+                                
+                              <li class="sortsTilteLi">
+                                <a href="{% url 'products:product_list' %}?category={{ s_cat.name }}">
+                                    {{ s_cat.name }}
+                                </a>
+                              </li>
+                            
+                    
+                  
+                        {% endfor %}
+                </ul>
+              </div>
+            </li>
+              {% endfor %}
+          
+          
+          
+          </ul>
+        </nav>
+      </section>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <section class="lg:hidden shadow-lg bg-whiteColor relative z-10">
+        <div class="container flex gap-2 justify-between items-center">
+          <form class="bg-inputSearchBar basis-[86%] flex items-center" 
+                method="get" action="{% url 'products:product_list' %}">
+              
+              {% csrf_token %}
+
+            <button type="submit" class="flex items-center px-2 py-2">
+              <i class="fa fa-search"></i>
+            </button>
+              <label>
+                  <input
+                    value="{{ request.GET.name }}"
+                    class="productName bg-[transparent] w-full px-4 py-2 outline-none rounded-sm"
+                    type="search"
+                    name="name"
+                    placeholder="جستجو"
+                  />
+              </label>
+          </form>
+        
+        
+        
+{% if request.user.is_authenticated %}
+    
+          <a
+            href="{% url 'auth:profile' %}"
+            class="basis-[10%] text-xl p-2 flex items-center justify-center"
+          >
+            <i class="far fa-user"></i>
+          </a>
+    
+            {% else %}
+    
+          <a
+            href="{% url 'auth:login' %}"
+            class="basis-[10%] text-xl p-2 flex items-center justify-center"
+          >
+            <i class="far fa-user"></i>
+          </a>
+
+            {% endif %}
+        
+        
+        
+        
+        </div>
+      </section>
+
+
+
+
+      <section
+        class="bg-whiteColor lg:block hidden translate-y-0 shadow-lg transition-all relative"
+      >
+        <div
+          id="hiddenScrollDiv"
+          class="container disableP py-0 px-2 transition-all"
+        >
+          <ul class="flex items-center text-[14px] font-light text-lowGray">
+            <li>
+              <h2
+                id="navBarLinks"
+                class="rounded-md hover:text-primary hover:bg-headerLinksBgColor flex gap-2 items-center cursor-pointer px-3 py-1 group"
+              >
+                <svg
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="size-7"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+                </svg>
+                <span class="font-bold">دسته بندی محصولات</span>
+                <nav
+                  class="2xl:container p-4 rounded-b-md bg-whiteColor z-9 shadow-lg group-hover:flex cursor-default disableP h-[430px] absolute hidden top-[36px] right-1/2 translate-x-1/2 w-full"
+                >
+                
+                  <div
+                    class="bg-headerNavBgColor flex flex-col w-[300px] text-blackColor overflow-y-auto"
+                    id="sortsProductsLinkCont"
+                  >  
+                  
+                    {% for category, s_category in all_categories.items %}
+                        
+                        <a
+                          href="{% url 'products:product_list' %}?category={{ category.name }}"
+                          value="link_{{ category.id }}"
+                          class="
+                          {% if forloop.counter == 1 %}headerNavHoverStyle{% endif %}
+                          w-full block px-4 py-3"
+                        >
+                          {{ category.name }}
+                        </a>
+                {% endfor %}
+                  </div>
+                
+                  <div class="w-full">
+                    <div id="producsUlParent" class="px-2">
+                    {% for category, s_category in all_categories.items %}
+{#                        {{ s_category.name }}#}
+                    <ul
+                        class="hidden maxHeight430px 
+                          {% if forloop.counter == 1 %}flexShow{% endif %}
+                        flex-col gap-10 list-disc text-primary 
+                        content-start flex-wrap w-full px-4 text-[12px] py-2"
+                        value="link_{{ s_cat.parent.id }}"
+                      >
+                    
+                        <li class="space-y-2">
+                          <a href="{% url 'products:product_list' %}?category={{ category.name }}"
+                             class="block text-primary">همه ی موارد این دسته</a>
+                        </li>
+                    
+                        {% for s_cat in s_category %}
+                        <li class="space-y-2">
+                          <a href="{% url 'products:product_list' %}?category={{ s_cat.name }}"
+                             class="block text-primary">{{ s_cat.name }}</a>
+                        </li>
+                        {% endfor %}
+                    
+                      </ul>
+                        {% endfor %}
+                    
+                    </div>
+                  </div>
+                
+                </nav>
+              </h2>
+            </li>
+
+            <li>
+              <a
+                href="{% url 'products:home' %}"
+                class="hover:text-primary hover:bg-headerLinksBgColor py-1 px-3 transition-all duration-300"
+                >صفحه اصلی</a
+              >
+            </li>
+
+            <li>
+              <a
+                href="{% url 'products:product_list' %}"
+                class="hover:text-primary hover:bg-headerLinksBgColor py-1 px-3 transition-all duration-300"
+                >فروشگاه</a
+              >
+            </li>
+          
+            <li>
+              <a
+                href="{% url 'carts:all' %}"
+                class="hover:text-primary hover:bg-headerLinksBgColor py-1 px-3 transition-all duration-300"
+                >سبد خرید من</a
+              >
+            </li>
+
+            <li>
+              <a
+                href="{% url 'orders:order_list' %}"
+                class="hover:text-primary hover:bg-headerLinksBgColor py-1 px-3 transition-all duration-300"
+                >سفارشات من</a
+              >
+            </li>
+          
+            <li>
+              <a
+                href="#"
+                class="hover:text-primary hover:bg-headerLinksBgColor py-1 px-3 transition-all duration-300"
+                >درباره ما</a
+              >
+            </li>
+          
+            <li>
+              <a
+                href="#"
+                class="hover:text-primary hover:bg-headerLinksBgColor py-1 px-3 transition-all duration-300"
+                >تماس با ما</a
+              >
+            </li>
+          
+          </ul>
+        </div>
+      </section>
+      <section class="hidden bg-whiteColor relative z-10">
+        <div class="container flex gap-4 items-center">
+          <p>صفحه اصلی</p>
+        </div>
+      </section>
+    </header>

@@ -1,0 +1,10 @@
+from django.test import TestCase
+
+class InvoiceTestCase(TestCase):
+    def setUp(self):
+        self.order = Order.objects.create(...)  # ساخت Order آزمایشی
+        self.invoice = Invoice.objects.create(...)  # ساخت Invoice آزمایشی
+
+    def test_pdf_generation(self):
+        pdf = generate_invoice_pdf(self.invoice)
+        self.assertGreater(len(pdf.getvalue()), 0)  # آیا PDF تولید شده است؟

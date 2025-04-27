@@ -1,0 +1,338 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+{% block title %} جزئیات محصول {% endblock %}
+
+{% block style %}
+    
+ {% endblock %}
+
+
+
+
+
+{% block content %} 
+    
+    
+    
+    
+    
+    <main class="lg:pt-[130px]">
+      <section
+        id="hiddenContent"
+        class="bg-lowOpacityColorBg items-start hidden fixed z-[9] top-0 right-0 w-full h-screen"
+      ></section>
+      <section>
+        <div
+          class="container flex gap-2 text-lowGray text-[12px] text-nowrap overflow-auto"
+        >
+          <a href="{% url 'products:home' %}">صفحه اصلی</a>
+        
+            {% if product.category.parent %}
+          <span class="cursor-default select-none">/</span>
+          <a href="{% url 'products:product_list' %}?category={{ product.category.parent.name }}">
+              {{ product.category.parent.name }}</a>
+            {% endif %}
+        
+            {% if product.category %}
+          <span class="cursor-default select-none">/</span>
+          <a href="{% url 'products:product_list' %}?category={{ product.category.name }}">
+              {{ product.category.name }}</a>
+            {% endif %}
+        
+          <span class="cursor-default select-none">/</span>
+          <p>{{ product.name }}</p>
+        </div>
+      </section>
+      <section>
+        <div class="container flex lg:flex-row flex-col gap-4">
+          <div class="lg:basis-[25%] w-full relative">
+            <img
+              class="w-full"
+              src="{% if product.cover_image %}
+                            {{ product.cover_image.url }}
+                            {% else %}
+                            {% static 'assets/images/default-image2.jpg' %}
+                            {% endif %}"
+              alt="{{ product.name }}"
+            />
+            <button
+              id="imagesShowCont"
+              class="p-2 absolute text-lowGray text-xl top-0 lg:right-0 max-w-max left-4"
+            >
+              <i class="fa fa-search"></i>
+            </button>
+            <div
+              id="imagesShow"
+              class="sm:bg-lowOpacityColorBg hidden py-2 backdrop-filter-[blur(50px)] transition-all bg-blackColor fixed top-0 left-0 w-full h-full items-center justify-center z-[100]"
+            >
+              <img
+                src="{% if product.cover_image %}
+                            {{ product.cover_image.url }}
+                            {% else %}
+                            {% static 'assets/images/default-image2.jpg' %}
+                            {% endif %}"
+                alt="{{ product.name }}"
+                class="w-full object-contain max-h-[700px] h-[95%]"
+              />
+              <button
+                class="absolute sm:bg-[transparent] bg-lowOpacityColorBg text-whiteColor left-[20px] text-2xl top-[10px] px-2 py-1 bg-red"
+              >
+                <i class="fa fa-remove"></i>
+              </button>
+            </div>
+          </div>
+          <div class="lg:basis-[75%] w-full">
+            <h1 class="py-2 border-b border-submitPageColorBorderLowBlack">
+              {{ product.name }}
+            </h1>
+            <div class="space-y-2 text-sm py-4">
+              <div class="flex gap-4">
+                <p>
+                  <i class="fa fa-barcode"></i> کد محصول : <span> {{ product.code }} </span>
+                </p>
+              
+{#                <p>#}
+{#                    {% if quantity == 0 %}#}
+{#                        <i class="fa fa-home"></i>#}
+{#                        <span> #}
+{#                            کالا در انبار موجود نیست#}
+{#                        </span>#}
+{#                    {% else %}#}
+{#                        <i class="fa fa-home"></i> موجودی انبار : #}
+{#                        <span> #}
+{#                        {{ quantity }}#}
+{#                        </span>#}
+{#                    {% endif %}#}
+{#                </p>#}
+              {% if product.category %}
+                <p>
+                  <i class="far fa-folder-open"></i> دسته بندی : 
+                  <a href="#" class="text-lowGray hover:text-blackColor"> {{ product.category.name }} </a>
+                </p>
+              {% endif %}
+              </div>
+
+                <p class="priceProduct text-lg" id="productPrice">
+                  <span class="setFormatNumber">{{ product.discounted_price }}</span>
+                <span> تومان </span>
+              </p>
+
+                <div>
+            
+            {% if product.unit_type == 1 %}
+                    
+                      <form method="post" action="{% url 'carts:add' %}" class="flex gap-2 flex-col">
+                          {% csrf_token %}
+                        <input type="hidden" name="product" value="{{ product.id }}">
+{#                        <input type="hidden" name="quantity" value="1.0">#}
+                        <div
+                          id="pcsProduct"
+                          class="flex justify-between p-2 max-w-[200px] w-full rounded-lg gap-2 boxBorder"
+                        >
+                          <button type="button">
+                            <i class="text-lg fa fa-plus"></i>
+                          </button>
+                            {{ form.quantity }}
+                            {{ form.quantity.errors }}
+                            <p>عدد</p>
+                          <button type="button">
+                            <i class="text-lg fa fa-minus"></i>
+                          </button>
+                        </div>
+                        <button
+                          type="submit"
+                          class="p-2 py-2 bg-redColor max-w-[200px] w-full opacity-75 hover:opacity-100 transition-all text-[16px] text-whiteColor rounded-lg"
+                        >
+                          <i class="fas fa-shopping-cart"></i>
+                           افزودن به سبد خرید
+                        </button>
+                          
+                      </form>
+                <p>* لطفا پس از وارد کردن تعداد دلخواه ، دکمه افزودن به سبد خرید را بزنید.</p>
+                
+            
+            {% else %}
+                    
+                      <form method="post" action="{% url 'carts:add' %}" class="flex gap-2 flex-wrap">
+                          {% csrf_token %}
+                        <input type="hidden" name="product" value="{{ product.id }}">
+{#                        <input type="hidden" name="quantity" value="1.0">#}
+                        <div
+                          id="pcsProduct"
+                          class="flex justify-between p-2 max-w-[200px] w-full rounded-lg gap-2 boxBorder"
+                        >
+                          <button type="button">
+                            <i class="text-lg fa fa-plus"></i>
+                          </button>
+                            {{ form.quantity }}
+                            {{ form.quantity.errors }}
+                            <p>کیلو</p>
+                          <button type="button">
+                            <i class="text-lg fa fa-minus"></i>
+                          </button>
+                        </div>
+                        <button
+                          type="submit"
+                          class="p-2 py-2 bg-redColor max-w-[200px] w-full opacity-75 hover:opacity-100 transition-all text-[16px] text-whiteColor rounded-lg"
+                        >
+                          <i class="fas fa-shopping-cart"></i>
+                           افزودن به سبد خرید
+                        </button>
+                          
+                      </form>
+
+                <p>قیمت نهایی : <span id="productPriceMathMethod" class="min-h-5">0</span></p>
+
+                <p>* فروش این کالا به صورت فله ای میباشد
+                              ، لطفا پس از وارد کردن وزن دلخواه ، دکمه افزودن به سبد خرید را بزنید.</p>
+                
+                {% endif %}
+            
+            
+            
+            
+            
+            
+            
+            
+{#                {% if cart_item and product.unit_type == 1 %}#}
+{##}
+{#                          <form method="post" action="{% url 'carts:update_cartitem' %}">#}
+{#                              {% csrf_token %}#}
+{#                                  <input type="hidden" name="cartitem_id" value="{{ cart_item.id }}">#}
+{#                            <div#}
+{#                              class="flex pcsProduct bg-whiteColor justify-between p-2 max-w-[200px] w-full rounded-lg gap-2 boxBorder"#}
+{#                            >#}
+{#                              <button type="submit" name="action" value="increase">#}
+{#                                <i class="text-lg fa fa-plus"></i>#}
+{#                              </button>#}
+{#                              <input#}
+{#                              disabled#}
+{#                                type="text"#}
+{#                                class="bg-[transparent] text-center w-full outline-none"#}
+{#                                name="asd"#}
+{#                                value="{{ cart_item.rounded_quantity }}"#}
+{#                              />#}
+{#                              <button type="submit" name="action" value="decrease">#}
+{#                                <i class="text-lg fa fa-minus"></i>#}
+{#                              </button>#}
+{#                            </div>#}
+{#                            عدد#}
+{#                          </form>#}
+{#                            #}
+{#                {% elif product.unit_type == 1 %}#}
+{#                        #}
+{#                              <form method="post" action="{% url 'carts:add' %}" class="flex gap-2 flex-wrap">#}
+{#                                  {% csrf_token %}#}
+{#                                <input type="hidden" name="product" value="{{ product.id }}">#}
+{#                                <input type="hidden" name="quantity" value="1.0">#}
+                {#                <div#}
+                {#                  id="pcsProduct"#}
+                {#                  class="flex justify-between p-2 max-w-[200px] w-full rounded-lg gap-2 boxBorder"#}
+                {#                >#}
+                {#                  <button type="button">#}
+                {#                    <i class="text-lg fa fa-plus"></i>#}
+                {#                  </button>#}
+                {#                    {{ form.quantity }}#}
+                {#                    {{ form.quantity.errors }}#}
+                {#                  <button type="button">#}
+                {#                    <i class="text-lg fa fa-minus"></i>#}
+                {#                  </button>#}
+                {#                </div>#}
+{#                                <button#}
+{#                                  type="submit"#}
+{#                                  class="p-2 py-2 bg-redColor max-w-[200px] w-full opacity-75 hover:opacity-100 transition-all text-[16px] text-whiteColor rounded-lg"#}
+{#                                >#}
+{#                                  <i class="fas fa-shopping-cart"></i>#}
+{#                                  افزودن به سبد خرید#}
+{#                                </button>#}
+{#                              </form>#}
+{#                            #}
+{#                {% endif %}#}
+                    
+                
+                </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    
+    {% if product.unit_type == 2 %}
+                
+      <section>
+       <div class="container">
+          <div class="boxBorder rounded-md p-4 space-y-2">
+            <h3>توجه</h3>
+            <p>
+              برای سفارش اجناس کیلویی میتوانید ارقام را به صورت اعشاری وارد
+              نمایید. مثال:
+            </p>
+            <p>250 گرم (ربع کیلو) به صورت: 0.250</p>
+            <p>500 گرم (نیم کیلو) به صورت: 0.500</p>
+            <p>یک کیلو و 250 گرم به صورت: 1.250</p>
+          </div>
+        </div>
+      </section>
+    
+    {% endif %}    
+    
+      <section>
+        <div class="container"></div>
+      </section>
+    </main>
+    
+    
+    
+    
+    
+{% endblock %}
+
+
+
+
+
+{% block scripts %}
+        <script>
+      $("#imagesShowCont").on("click", () => {
+        $("#imagesShow").toggleClass("showImagesShow");
+      });
+      $("#imagesShow ").on("click", () => {
+        $("#imagesShow").removeClass("showImagesShow");
+      });
+
+      let minLength = {% if product.unit_type == 1 %}1{% else %}0.1{% endif %};
+      let methodNumber = minLength;
+      let maxFloat = 1;
+      function methodPcsProduct(e) {
+        if ($("#pcsProduct input")[0].value) {
+          $("#productPriceMathMethod").text(
+            Number(
+              $("#pcsProduct input")[0].value *
+                $("#productPrice")[0].children[0].textContent.replace(/\,/g, "")
+            ).toLocaleString()
+          );
+        }
+      }
+      $("#pcsProduct input").on("input", methodPcsProduct);
+      $("#pcsProduct button").on("click", function () {
+        if (this.children[0].classList.contains("fa-plus")) {
+        let value =
+            Number($("#pcsProduct input")[0].value) + Number(methodNumber);
+          if (String(value).includes(".")) value = value.toFixed(maxFloat);
+          $("#pcsProduct input").val(value);
+        } else if ($("#pcsProduct input")[0].value > minLength) {
+          let value =
+            Number($("#pcsProduct input")[0].value) - Number(methodNumber);
+          if (String(value).includes(".")) value = value.toFixed(maxFloat);
+          $("#pcsProduct input").val(value);
+        }
+        methodPcsProduct();
+      });
+      
+    </script>
+ {% endblock %}
+
+

@@ -1,0 +1,41 @@
+{% extends 'accounts_base.html' %}
+{% load static %}
+
+
+    {% block title %} ثبت نام {% endblock %}
+
+          {% block form %}
+
+      <section>
+        <form class="flex flex-col gap-5" method="post">
+            {% csrf_token %}
+          <h1 class="text-xl text-lowGray">ثبت ‌نام</h1>
+          <div>
+            <label for="userName" class="text-sm text-lowGray">
+              لطفا شماره موبایل خود را وارد کنید
+            </label>
+              {{ form.phone_number }}
+              {{ form.phone_number.errors }}
+              {{ form.non_field_errors }}
+          </div>
+          <div>
+            <label for="userPass" class="text-sm text-lowGray">
+              لطفا رمز خود را وارد کنید
+            </label>
+              {{ form.password }}
+              {{ form.password.errors }}
+          </div>
+          <button type="submit"
+            class="bg-redColor opacity-80 hover:opacity-100 transition-opacity duration-300 text-whiteColor py-3 w-full rounded-md"
+          >
+            ثبت نام
+          </button>
+        </form>
+      </section>
+      <section>
+        <p class="text-[14px] text-center">
+           حساب دارید؟
+          <a href="{% url 'auth:login' %}" class="text-linkColor"> از اینجا وارد شوید </a>
+        </p>
+      </section>
+    {% endblock %}

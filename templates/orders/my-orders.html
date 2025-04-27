@@ -1,0 +1,639 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+
+{% block title %} سفارشات من {% endblock %}
+
+
+
+{% block style %} {% endblock %}
+
+
+
+{% block content %}
+
+
+
+
+
+    <main class="lg:pt-[120px]">
+      <section
+        id="hiddenContent"
+        class="bg-lowOpacityColorBg items-start hidden fixed z-[9] top-0 right-0 w-full h-screen"
+      ></section>
+      <section
+        id="hiddenContent"
+        class="bg-lowOpacityColorBg items-start hidden fixed z-[9] top-0 right-0 w-full h-screen"
+      ></section>
+      <section>
+        <div
+          class="container flex lg:flex-row justify-between items-start flex-col p-2 gap-5"
+        >
+          <aside
+            class="min-w-[338px] lg:block hidden sticky top-[120px] boxBorder rounded-md py-2 px-4"
+          >
+            <nav>
+              <ul class="space-y-3">
+                <li class="flex flex-col gap-4 px-4">
+                  <div class="flex items-center gap-4">
+                    <img
+                      src="https://www.zagros.market/themes/shop-theme1/images/avatar.svg"
+                      alt="پروفایل"
+                      class="w-[44px]"
+                    />
+                    <p>{{ request.user.phone_number }}</p>
+                  </div>
+                  <span class="w-full boxBorder"></span>
+                </li>
+                <li class="selectedBeforBorderRight">
+                  <a
+                    href="{% url 'orders:order_list' %}"
+                    class="flex items-center transition-[background] gap-4 w-full py-4 hover:bg-submitPageColorBorderLowBlack px-4 text-sm"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="size-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184"
+                      />
+                    </svg>
+                    <span class="font-bold">سفارشات</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="{% url 'auth:address_list' %}"
+                    class="flex items-center transition-[background] gap-4 w-full py-4 hover:bg-submitPageColorBorderLowBlack px-4 text-sm"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="size-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+                      />
+                    </svg>
+
+                    <span class="text-lowGray">آدرس ها</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="{% url 'auth:profile' %}"
+                    class="flex items-center transition-[background] gap-4 w-full py-4 hover:bg-submitPageColorBorderLowBlack px-4 text-sm"
+                  >
+                    <i class="far fa-user text-2xl"></i>
+                    <span class="text-lowGray"
+                      >اطلاعات حساب کاربری</span
+                    >
+                  </a>
+                </li>
+                <li>
+                    <form method="post" action="{% url 'auth:logout' %}">
+                        {% csrf_token %}
+                  <button
+                          type="submit"
+                    class="flex items-center transition-[background] gap-4 w-full py-4 hover:bg-submitPageColorBorderLowBlack px-4 text-sm"
+                  >
+                    <i class="fa fa-sign-out text-2xl"></i>
+                    <span class="text-lowGray">خروج</span>
+                  </button>
+                    </form>
+
+                </li>
+              </ul>
+            </nav>
+          </aside>
+        
+    {% if not orders %}
+          <div class="sm:text-lg text-sm divTextAlert danger">
+            <p>شما هنوز سفارشی ندارید!</p>
+          </div>
+    {% else %}
+        
+
+
+          <div class="w-full space-y-5 lg:boxBorder rounded-md p-3">
+            <h2 class="lg:flex hidden flex-col gap-2 py-4 w-[max-content]">
+              <span>سفارش ها</span>
+              <span class="w-full bg-primary h-[2px]"></span>
+            </h2>
+
+
+{#            <form>#}
+{#              <fieldset#}
+{#                class="text-lowGray boxBorder p-2 flex gap-4 lg:flex-row flex-col"#}
+{#              >#}
+{#                <legend class="mr-4">فیلتر اطلاعات</legend>#}
+{#                <div#}
+{#                  class="boxBorder flex lg:w-max w-full lg:flex-row flex-col items-end gap-2 px-2 py-3"#}
+{#                >#}
+{#                  <div class="flex flex-col w-full lg:max-w-[200px]">#}
+{#                    <p>از تاریخ</p>#}
+{#                    <input#}
+{#                      type="text"#}
+{#                      name="dateFrom"#}
+{#                      class="outline-none w-full px-2 py-1 rounded border-2 border-submitPageColorBorderLowBlack focus:border-2 focus:border-submitPageColorBorderBlue"#}
+{#                      data-jdp="true"#}
+{#                    />#}
+{#                  </div>#}
+{#                  <div class="flex flex-col w-full lg:max-w-[200px]">#}
+{#                    <p>تا تاریخ</p>#}
+{#                    <input#}
+{#                      type="text"#}
+{#                      name="dateTo"#}
+{#                      class="outline-none w-full px-2 py-1 rounded border-2 border-submitPageColorBorderLowBlack focus:border-2 focus:border-submitPageColorBorderBlue"#}
+{#                      data-jdp="true"#}
+{#                    />#}
+{#                  </div>#}
+{#                </div>#}
+{#                <div#}
+{#                  class="grid md:grid-cols-[minmax(150px,350px)_minmax(150px,350px)_.3fr] grid-cols-1 gap-2"#}
+{#                >#}
+{#                  <div#}
+{#                    class="flex flex-col gap-2 p-2 boxBorder relative w-full"#}
+{#                  >#}
+{#                    <p>وضعیت</p>#}
+{#                    <select#}
+{#                      type="text"#}
+{#                      id="statusSelect"#}
+{#                      name="status"#}
+{#                      class="hidden"#}
+{#                      value="all"#}
+{#                    >#}
+{#                      <option value="all">همه</option>#}
+{#                    </select>#}
+{#                    <div#}
+{#                      id="statusSelectCont"#}
+{#                      class="outline-none select-none relative z-[1] cursor-pointer p-2 rounded border-2 bg-whiteColor border-submitPageColorBorderLowBlack focus:border-2 focus:border-submitPageColorBorderBlue sm:max-w-[350px] w-full"#}
+{#                    >#}
+{#                      همه#}
+{#                    </div>#}
+{#                    <div#}
+{#                      id="statusSelectOptions"#}
+{#                      class="absolute z-[2] hidden top-[81px] right-2 w-full border-submitPageColorBorderBlue border"#}
+{#                    >#}
+{#                      <ul#}
+{#                        class="max-h-[150px] overflow-auto bg-whiteColor flex flex-col"#}
+{#                      >#}
+{#                        <li valueli="all" class="p-2">همه</li>#}
+{#                        <li valueli="value2" class="p-2">در انتضار پرداخت</li>#}
+{#                        <li valueli="value3" class="p-2">در حال پردازش</li>#}
+{#                        <li valueli="value4" class="p-2">پردازش شده</li>#}
+{#                        <li valueli="value5" class="p-2">تحویل داده شده</li>#}
+{#                      </ul>#}
+{#                    </div>#}
+{#                  </div>#}
+{#                  <div#}
+{#                    class="flex flex-col gap-2 p-2 boxBorder relative w-full"#}
+{#                  >#}
+{#                    <p>روش پردتخت</p>#}
+{#                    <select#}
+{#                      type="text"#}
+{#                      id="payMethod"#}
+{#                      name="payMethod"#}
+{#                      class="hidden"#}
+{#                      value="all"#}
+{#                    >#}
+{#                      <option value="all">همه</option>#}
+{#                    </select>#}
+{#                    <div#}
+{#                      id="payMethodCont"#}
+{#                      class="outline-none select-none relative z-[1] cursor-pointer p-2 rounded border-2 bg-whiteColor border-submitPageColorBorderLowBlack focus:border-2 focus:border-submitPageColorBorderBlue sm:max-w-[350px] w-full"#}
+{#                    >#}
+{#                      همه#}
+{#                    </div>#}
+{#                    <div#}
+{#                      id="payMethodOptions"#}
+{#                      class="absolute z-[2] hidden top-[81px] right-2 w-full border-submitPageColorBorderBlue border"#}
+{#                    >#}
+{#                      <ul#}
+{#                        class="max-h-[150px] overflow-auto bg-whiteColor flex flex-col"#}
+{#                      >#}
+{#                        <li valueli="all" class="p-2">همه</li>#}
+{#                        <li valueli="value2" class="p-2">در انتضار پرداخت</li>#}
+{#                        <li valueli="value3" class="p-2">در حال پردازش</li>#}
+{#                        <li valueli="value4" class="p-2">پردازش شده</li>#}
+{#                        <li valueli="value5" class="p-2">تحویل داده شده</li>#}
+{#                      </ul>#}
+{#                    </div>#}
+{#                  </div>#}
+{#                  <div>#}
+{#                    <div class="flex items-end h-full">#}
+{#                      <button#}
+{#                        type="submit"#}
+{#                        class="bg-redColor border-none opacity-80 hover:opacity-100 transition-opacity duration-300 text-whiteColor px-5 py-2 rounded-md"#}
+{#                      >#}
+{#                        نمایش#}
+{#                      </button>#}
+{#                    </div>#}
+{#                  </div>#}
+{#                </div>#}
+{#              </fieldset>#}
+{#            </form>#}
+
+            <table
+              class="lg:table hidden w-full boxBorder text-sm text-lowGray"
+            >
+              <thead>
+                <tr>
+                  <th class="text-start px-4 py-4">#</th>
+                  <th class="text-start px-4 py-4">
+                    <a href="#"> شماره سفارش </a>
+                  </th>
+{#                  <th class="text-start px-4 py-4">#}
+{#                    <a href="#">کد پیگیری سفارش</a>#}
+{#                  </th>#}
+                  <th class="text-start px-4 py-4">
+                    <a href="#">تاریخ و ساعت</a>
+                  </th>
+                  <th class="text-start px-4 py-4"><a href="#">وضعیت</a></th>
+{#                  <th class="text-start px-4 py-4">#}
+{#                    <a href="#">روش پرداخت</a>#}
+{#                  </th>#}
+                  <th class="text-start px-4 py-4"><a href="#">مبلغ</a></th>
+                  <th class="text-start px-4 py-4"><a href="#"> عملیات</a></th>
+                </tr>
+              </thead>
+              <tbody>
+
+
+              {% for order in orders %}
+                <tr class="odd:bg-lowerGray">
+                  <td class="text-sm px-4">{{ forloop.counter }}</td>
+                  <td class="text-sm px-4">
+                    <a href="{% url 'orders:order_detail' order.id %}"> {{ order.code }} </a>
+                  </td>
+{#                  <td class="text-sm px-4">8944322715</td>#}
+                  <td class="text-sm px-4">
+                    <span>{{ order.created_datetime_to_jalali|date:"y/m/d H:i" }}</span>
+                  </td>
+                  <td class="text-sm px-4">
+                    <span class="
+                    {% if order.status == 'در انتظار پرداخت' or order.status == 'لغو شده' %}
+                    danger 
+                    {% elif order.status == 'پرداخت درب منزل' %}
+                    warning
+                    {% else %}
+                    success
+                    {% endif %}
+                    px-2 py-1 rounded-md"> {{ order.status }} </span>
+                  </td>
+{#                  <td class="text-sm px-4">#}
+{#                    <span>درگاه ملت</span>#}
+{#                  </td>#}
+                  <td class="text-sm px-4">
+                    <p class="setFormatNumber"> {{ order.get_price }} </p>تومان
+                  </td>
+                  <td class="text-sm py-4">
+                    <a
+                      href="{% url 'orders:order_detail' order.id %}"
+                      class="bg-skyColor rounded-md py-1 px-4"
+                      >مشاهده جزئیات</a
+                    >
+                  </td>
+                </tr>
+              {% endfor %}
+
+
+
+              </tbody>
+            </table>
+            <div class="lg:hidden block boxBorder rounded-lg">
+              <ul class="flex gap-2 flex-col">
+
+
+
+
+              {% for order in orders %}
+
+
+                <li class="p-2 odd:bg-lowerGray flex gap-2 flex-col">
+                  <div class="flex justify-between items-center py-2">
+                    <span>ردیف</span>
+                    <span>{{ forloop.counter }}</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2">
+                    <span>شماره سفارش :</span>
+                    <a href="{% url 'orders:order_detail' order.id %}">{{ order.code }}</a>
+                  </div>
+{#                  <div class="flex justify-between items-center py-2">#}
+{#                    <span>کد پیگیری سفارش:</span>#}
+{#                    <span>564</span>#}
+{#                  </div>#}
+                  <div class="flex justify-between items-center py-2">
+                    <span>تاریخ و ساعت :</span>
+                    <span>{{ order.created_datetime_to_jalali|date:"y/m/d H:i" }}</span>
+                  </div>
+
+                  <div class="flex justify-between items-center py-2">
+                    <span>وضعیت :</span>
+                    <span class="
+                    {% if order.status == 'در انتظار پرداخت' or order.status == 'لغو شده' %}
+                    danger 
+                    {% elif order.status == 'پرداخت درب منزل' %}
+                    warning
+                    {% else %}
+                    success
+                    {% endif %}
+                     px-2 py-1 rounded-md">{{ order.status }}</span>
+                  </div>
+
+{#                  <div class="flex justify-between items-center py-2">#}
+{#                    <span>روش پرداخت:</span>#}
+{#                    <span>درگاه ملت</span>#}
+{#                  </div>#}
+
+                  <div class="flex justify-between items-center py-2">
+                    <span>مبلغ : </span>
+                    <p class="setFormatNumber"> {{ order.get_price }} </p>تومان
+                  </div>
+                  <div class="flex justify-between items-center py-2">
+                    <span>عملیات :</span>
+                    <a
+                      href="{% url 'orders:order_detail' order.id %}"
+                      class="bg-skyColor rounded-md py-1 px-4"
+                      >مشاهده جزئیات</a
+                    >
+                  </div>
+                </li>
+
+              {% endfor %}
+
+
+
+
+              </ul>
+            </div>
+            <div
+              class="text-lowGray text-sm flex flex-wrap justify-between items-center gap-4"
+            >
+{#              <p>#}
+{#                نمایش <span>1</span> تا <span>1</span> از <span>1</span> ردیف#}
+{#              </p>#}
+              <ul class="flex justify-center gap-2">
+
+              
+{#               first page#}
+{#                {% if page_obj.number == 1 %}#}
+                    <li {% if page_obj.number == 1 %} class="paginationLiActive" {% endif %}>
+                      <a
+                        href="?{% if request.GET %}{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page=1"
+                        class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                        >1</a>
+                    </li>
+{#                {% endif %}#}
+          
+              
+{#               previous page #}
+                {% if page_obj.has_previous and page_obj.number != 2 %}
+                    {% if page_obj.number > 3 %}
+                        <li>
+                          <a
+                            href="#"
+                            class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                            >...</a>
+                        </li>
+                    {% endif %}
+                    
+                    <li>
+                      <a
+                        href="?{% if request.GET %}{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page={{ page_obj.previous_page_number }}"
+                        class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                        >{{ page_obj.previous_page_number }}</a>
+                    </li>
+                {% endif %}
+
+          
+{#              current page #}
+          {% if page_obj.number != 1 %}
+                <li class="paginationLiActive">
+                  <a
+                    href="#"
+                    class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                    >{{ page_obj.number }}</a>
+                </li>
+          {% endif %}
+
+{#               next page #}
+                {% if page_obj.has_next %}
+                    <li>
+                      <a
+                        href="?{% if request.GET %}{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page={{ page_obj.next_page_number }}"
+                        class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                        >{{ page_obj.next_page_number }}</a>
+                    </li>
+                    
+                    {% if page_obj.next_page_number > page_obj.number and page_obj.next_page_number != page_obj.paginator.num_pages %}
+                    <li>
+                      <a
+                        href="#"
+                        class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                        >...</a>
+                    </li>
+                    {% endif %}
+                {% endif %}
+          
+          
+          
+{#              last page #}
+                {% if page_obj.number != page_obj.next_page_number and page_obj.next_page_number != page_obj.paginator.num_pages  %}
+
+                    
+                    <li>
+                      <a
+                        href="?{% if request.GET %}{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page={{ page_obj.paginator.num_pages }}"
+                        class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                        >{{ page_obj.paginator.num_pages }}</a>
+                    </li>
+                {% endif %}
+              
+          
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+        </div>
+      </section>
+    </main>
+
+
+
+
+
+
+
+
+
+
+ {% endblock %}
+
+
+
+
+  {% block scripts %}
+         <script>
+      console.log();
+      let isTouchLi = false;
+      function clickLiHand(
+        nameCont,
+        li,
+        showClass,
+        select,
+        statusCont,
+        isLi = true
+      ) {
+        document.querySelector(nameCont).classList.remove(showClass);
+        document.querySelector(nameCont).classList.add("hidden");
+        if (!isLi) return;
+        isTouchLi = true;
+        select.options[0].textContent = li.textContent;
+        select.options[0].value = li.getAttribute("valueli");
+        select.value = select.options[0].value;
+        statusCont.text(li.textContent);
+      }
+
+      function searchLi(arr, select) {
+        arr.forEach((li) => {
+          if (select.innerText === li.innerText) {
+            li.classList.add("liActive");
+          } else {
+            li.classList.remove("liActive");
+          }
+        });
+      }
+      window.addEventListener("resize", () => {
+        $("#statusSelectOptions").css(
+          "width",
+          $("#statusSelectCont")[0].scrollWidth + "px"
+        );
+        $("#payMethodtOptions").css(
+          "width",
+          $("#payMethodtCont")[0].scrollWidth + "px"
+        );
+      });
+      $("#statusSelectCont").on("click", function (e) {
+        e.preventDefault();
+        $("#statusSelectOptions").css(
+          "width",
+          $("#statusSelectCont")[0].scrollWidth + "px"
+        );
+        $("#statusSelectOptions").toggleClass("block");
+        $("#statusSelectOptions").toggleClass("hidden");
+      });
+
+      $("#payMethodCont").on("click", function (e) {
+        e.preventDefault();
+        $("#payMethodOptions").css(
+          "width",
+          $("#payMethodCont")[0].scrollWidth + "px"
+        );
+        $("#payMethodOptions").toggleClass("block");
+        $("#payMethodOptions").toggleClass("hidden");
+      });
+
+      $("#statusSelectOptions li").on("click", function () {
+        isTouchLi = true;
+        clickLiHand(
+          "#statusSelectOptions",
+          this,
+          "block",
+          $("#statusSelect")[0],
+          $("#statusSelectCont")
+        );
+        searchLi(
+          Array.from($("#statusSelectOptions li")),
+          $("#statusSelectCont")[0]
+        );
+      });
+
+      $("#payMethodOptions li").on("click", function () {
+        isTouchLi = true;
+        clickLiHand(
+          "#payMethodOptions",
+          this,
+          "block",
+          $("#payMethod")[0],
+          $("#payMethodCont")
+        );
+        searchLi(
+          Array.from($("#statusSelectOptions li")),
+          $("#statusSelectCont")[0]
+        );
+      });
+
+      $("#statusSelectOptions li").on("mouseover", function () {
+        $("#statusSelectOptions li").removeClass("liActive");
+        this.classList.add("liActive");
+      });
+
+      $("#payMethodOptions li").on("mouseover", function () {
+        $("#payMethodOptions li").removeClass("liActive");
+        this.classList.add("liActive");
+      });
+
+      // set to defualt show selects
+      $(window).on("click", function (e) {
+        if (e.target.id != "statusSelectCont") {
+          clickLiHand("#statusSelectOptions", "", "block", "", "", false);
+          searchLi(
+            Array.from($("#statusSelectOptions li")),
+            $("#statusSelectCont")[0]
+          );
+        }
+        if (e.target.id != "payMethodCont") {
+          clickLiHand("#payMethodOptions", "", "block", "", "", false);
+          searchLi(
+            Array.from($("#payMethodOptions li")),
+            $("#payMethodCont")[0]
+          );
+        }
+        if (!isTouchLi && $("#statusSelect")[0].value) {
+          searchLi(
+            Array.from($("#statusSelectOptions li")),
+            $("#statusSelectCont")[0]
+          );
+          searchLi(
+            Array.from($("#payMethodOptions li")),
+            $("#payMethodCont")[0]
+          );
+        }
+      });
+    </script>
+    <script>
+      let addUs_birthday = document.querySelector("#user_birthday");
+      jalaliDatepicker.startWatch({
+        dayRendering: function (dayOptions, addUs_birthday) {
+          return {
+            isHollyDay: dayOptions.month == 1 && dayOptions.day <= 4,
+          };
+        },
+      });
+    </script>
+   {% endblock %}
+
+
+
+
+
+

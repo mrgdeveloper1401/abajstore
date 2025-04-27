@@ -1,0 +1,821 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+{% block title %} آباج مارکت {% endblock %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'styles/swiper.min.css' %}" />
+    <script src="{% static 'scripts/jquery.js' %}"></script>
+    <script src="{% static 'scripts/swiper.min.js' %}"></script>
+ {% endblock %}
+
+{% block content %}
+    
+    
+    
+    
+    
+    <main class="lg:pt-[120px]">
+      <section
+        id="hiddenContent"
+        class="bg-lowOpacityColorBg items-start hidden fixed z-[9] top-0 right-0 w-full h-screen"
+      ></section>
+      <section>
+        <div
+          class="2xl:container p-4 md:flex block gap-[20px] md:space-y-0 space-y-4"
+        >
+            
+            
+            
+          <div class="flex-shrink-[3] w-full md:w-[76%]">
+            <div class="swiper firstSectionSlider">
+              <div class="swiper-wrapper rounded-md overflow-hidden">
+                  {% for banner in banner_images %}
+                    <div class="swiper-slide">
+                      <img
+                        loading="lazy"
+                        src="{{ banner.banner.url }}"
+                        class="h-auto max-w-full max-h-fit w-full"
+                        alt="بنر"
+                      />
+                    </div>
+                  {% endfor %}
+{#                <div class="swiper-slide">#}
+{#                  <img#}
+{#                    loading="lazy"#}
+{#                    src="{% static 'assets/images/33.jpg' %}"#}
+{#                    class="h-auto max-w-full max-h-fit w-full"#}
+{#                    alt="عکس"#}
+{#                  />#}
+{#                </div>#}
+{#                <div class="swiper-slide">#}
+{#                  <img#}
+{#                    loading="lazy"#}
+{#                    src="{% static 'assets/images/45.jpg' %}"#}
+{#                    class="h-auto max-w-full max-h-fit w-full"#}
+{#                    alt="عکس"#}
+{#                  />#}
+{#                </div>#}
+              </div>
+            </div>
+          </div>
+            
+            
+          <div class="flex-shrink-[3] w-full md:w-[24%] md:flex flex-col justify-between">
+            <div class="mb-4">
+                <div class="swiper-slide">
+                  <img
+                    loading="lazy"
+                    src="{% static 'assets/images/1.1.jpg' %}"
+                    class="max-w-full rounded-md md:max-h-[240px] inline-block"
+                    alt="بنر"
+                  />
+                </div>
+            </div>
+
+            <div class="">
+                <div class="swiper-slide">
+                  <img
+                    loading="lazy"
+                    src="{% static 'assets/images/1.2.jpg' %}"
+                    class="max-w-full rounded-md md:max-h-[240px] inline-block"
+                    alt="بنر"
+                  />
+                </div>
+            </div>
+          </div>
+            
+            
+            
+            
+            
+            
+{#          <a#}
+{#            href="#"#}
+{#            class="md:flex block flex-shrink-[3] flex-col justify-between items-end flex-[1 0 5px] md:space-y-0 space-y-4"#}
+{#          >#}
+{#            <img#}
+{#              loading="lazy"#}
+{#              src="{% static 'assets/images/1.2.jpg' %}"#}
+{#              class="max-w-full rounded-md md:max-h-[240px] inline-block"#}
+{#              alt="عکس"#}
+{#            />#}
+{#            <img#}
+{#              loading="lazy"#}
+{#              src="{% static 'assets/images/1.1.jpg' %}"#}
+{#              class="max-w-full rounded-md md:max-h-[240px] inline-block"#}
+{#              alt="عکس"#}
+{#            />#}
+{#          </a>#}
+            
+            
+            
+            
+        </div>
+      </section>
+        
+        
+        
+    
+    
+    
+    
+    
+    
+      <section>
+        <div class="2xl:container p-4">
+          <div
+            class="bg-lowerGray boxBorder rounded-md flex flex-col gap-2 p-5"
+          >
+            <div>
+              <div class="flex justify-between">
+                <h1>جدیدترین ها</h1>
+                <a href="{% url 'products:product_list' %}?order_by=-created" class="text-submitPageColorBorderBlue"
+                  >مشاهده همه</a
+                >
+              </div>
+            </div>
+            <div class="swiper miveSabzSlider w-full">
+              <div class="swiper-wrapper select-none">
+                  
+                  
+                  {% for new_product in new_products %}
+                <div
+                  class="swiper-slide min-w-[200px] max-w-[300px] bg-whiteColor rounded-md overflow-hidden space-y-2 p-3"
+                >
+                  <a
+                    href="{% url 'products:product_detail' new_product.id %}"
+                    target="_blank"
+                    class="flex gap-2 flex-col justify-center items-center"
+                  >
+                    <img
+                      loading="lazy"
+                      class="w-[200px] h-[180px] aspect-video object-contain inline-block"
+                      src="{% if new_product.cover_image %}
+                            {{ new_product.cover_image.url }}
+                            {% else %}
+                            {% static 'assets/images/default-image2.jpg' %}
+                            {% endif %}"
+                      alt="{{ new_product.name }}"
+                    />
+                    <p
+                      class="text-sm text-lowGray h-[45px] overflow-hidden text-ellipsis w-full"
+                    >
+                      {{ new_product.name }}
+                    </p>
+                  </a>
+                  <div class="py-2">
+                    <div class="flex gap-2 justify-between items-start">
+                    
+                    
+                    
+                <form method="post" action="{% url 'carts:add' %}">
+                      {% csrf_token %}
+                  <input type="hidden" name="product" value="{{ new_product.id }}">
+                <input type="hidden" name="quantity" value="
+                    {% if new_product.unit_type == 1 %}
+                    1.0
+                    {% else %}
+                    0.1
+                    {% endif %}
+                    ">
+                    <button type="submit"
+                      class="p-3 flex justify-center items-center bg-primary text-whiteColor rounded-md"
+                    >
+                      <i class="fa fa-plus"></i>
+                    </button>
+                  </form>
+                    
+                    
+                    
+                    
+{#                      <a#}
+{#                        href="{% url 'products:product_detail' new_product.id %}"#}
+{#                        class="p-3 flex justify-center items-center bg-primary text-whiteColor rounded-md"#}
+{#                      >#}
+{#                        <i class="fa fa-plus"></i>#}
+{#                      </a>#}
+                    
+                    
+                    
+                      <div class="price">
+                        <div class="text-[12px] flex gap-2">
+                            
+                            
+                            {% if new_product.discount %}
+                          <del class="text-mdGray">
+                            {{ new_product.price }}
+                            <span>تومان</span>
+                          </del>
+                          <span
+                            class="px-2 text-sm text-whiteColor bg-primary rounded-2xl"
+                            >{{ new_product.discount }}%</span
+                          >
+                            {% endif %}
+                            
+                        </div>
+                          
+                        <p class="text-end">
+                          <span class="setFormatNumber">{{ new_product.discounted_price }}</span>
+                          <span>تومان</span>
+                        </p>
+                      </div>
+                    </div>
+{#                    <p class="text-sm text-lowBlue py-3">#}
+{#                      (1) عدد در سبد خرید شما#}
+{#                    </p>#}
+                  </div>
+                </div>
+                  {% endfor %}
+                  
+                  
+                  
+              </div>
+              <div class="swiper-button-prev"></div>
+              <div class="swiper-button-next"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    
+    
+    
+    
+    
+    
+    
+        
+        
+        
+        
+        
+        
+      <section class="py-4">
+        <div class="2xl:container p-4">
+          <h1 class="text-center sm:text-2xl text-lg text-lowGray">
+            دسته بندی کالاهای آباج مارکت
+          </h1>
+            <div
+            class="grid lg:grid-cols-[repeat(auto-fit,minmax(166px,210px))] sm:grid-cols-[repeat(auto-fit,minmax(166px,180px))] grid-cols-2 gap-5 justify-center"
+          >
+              
+              {% for category, s_category in all_categories.items %}
+            <a href="{% url 'products:product_list' %}?category={{ category.name }}" 
+               class="flex flex-col items-center gap-2">
+            
+            
+            {% if category.image %}
+              <img
+                loading="lazy"
+                src="{{ category.image.url }}"
+                class="w-full"
+                alt="{{ category.name }}"
+              />
+                {% else %}
+              <img
+                loading="lazy"
+                src="{% static 'assets/images/banermaye.jpg' %}"
+                class="w-full"
+                alt="{{ category.name }}"
+              />
+                {% endif %}
+            
+            
+              <h2>{{ category.name }}</h2>
+            </a>
+              {% endfor %}
+{#          #}
+{#              {% for category, s_category in all_categories.items %}#}
+{#                  {% for cat in s_category %}#}
+{#                          <a href="{% url 'products:product_list' %}?category={{ cat.name }}" #}
+{#               class="flex flex-col items-center gap-2">#}
+{#                          #}
+{#                          #}
+{#            {% if category.image %}#}
+{#              <img#}
+{#                loading="lazy"#}
+{#                src="{{ cat.image.url }}"#}
+{#                class="w-full"#}
+{#                alt="{{ cat.name }}"#}
+{#              />#}
+{#                {% else %}#}
+{#              <img#}
+{#                loading="lazy"#}
+{#                src="{% static 'assets/images/IMG-0069-500x500.jpg' %}"#}
+{#                class="w-full"#}
+{#                alt="{{ cat.name }}"#}
+{#              />#}
+{#                {% endif %}#}
+{#                          #}
+{#                          #}
+{#                          #}
+{#              <h2>{{ cat.name }}</h2>#}
+{#            </a>#}
+{#              {% endfor %}#}
+{#              {% endfor %}#}
+          
+          </div>
+        </div>
+      </section>
+        
+        
+        
+        
+        
+{#      <section>#}
+{#        <div class="2xl:container p-4">#}
+{#          <div class="bg-orangeColor rounded-md flex flex-col gap-2 p-5">#}
+{#            <div>#}
+{#              <h1>بیشترین تخفیف</h1>#}
+{#              <div class="flex justify-between sm:text-md text-sm">#}
+{#                <p class="text-lowGray">مرتب سازی بر اساس جدیدترین</p>#}
+{#                  </br>#}
+{#                <a href="{% url 'products:product_list' %}?order_by=-discount" class="text-submitPageColorBorderBlue"#}
+{#                  >مشاهده همه</a#}
+{#                >#}
+{#              </div>#}
+{#              <span#}
+{#                class="w-full block relative mb-4 bg-submitPageColorBorderLowBlack h-[2px] after:absolute after:w-[200px] after:bg-primary after:h-[2px] after:top-0 after:right-0 after:content-['']"#}
+{#              ></span>#}
+{#            </div>#}
+{#            <div class="swiper miveSabzSlider w-full">#}
+{#              <div class="swiper-wrapper select-none">#}
+{#                  #}
+{#                  #}
+{#                    {% for d_product in most_discount %}#}
+{#                <div#}
+{#                  class="swiper-slide min-w-[200px] max-w-[300px] bg-whiteColor rounded-md overflow-hidden space-y-2 p-3"#}
+{#                >#}
+{#                  <a#}
+{#                    href="{% url 'products:product_detail' d_product.id %}"#}
+{#                    target="_blank"#}
+{#                    class="flex gap-2 flex-col justify-center items-center"#}
+{#                  >#}
+{#                    <img#}
+{#                      loading="lazy"#}
+{#                      class="w-[200px] min-h-[180px]"#}
+{#                      src="{% if d_product.cover_image %}#}
+{#                            {{ d_product.cover_image.url }}#}
+{#                            {% else %}#}
+{#                            {% static 'assets/images/default-image2.jpg' %}#}
+{#                            {% endif %}"#}
+{#                      alt="عکس"#}
+{#                    />#}
+{#                    <p#}
+{#                      class="text-sm text-lowGray max-h-[45px] overflow-hidden text-ellipsis"#}
+{#                    >#}
+{#                      {{ d_product.name }}#}
+{#                    </p>#}
+{#                  </a>#}
+{#                  <div class="py-2">#}
+{#                    <div class="flex gap-2 justify-between items-start">#}
+{#                      <a#}
+{#                        href="{% url 'products:product_detail' d_product.id %}"#}
+{#                        class="p-3 flex justify-center items-center bg-primary text-whiteColor rounded-md"#}
+{#                      >#}
+{#                        <i class="fa fa-plus"></i>#}
+{#                      </a>#}
+{#                      <div class="price">#}
+{#                        <div class="text-[12px] flex gap-2">#}
+{#                            #}
+{#                            #}
+{#                            {% if d_product.discount %}#}
+{#                          <del class="text-mdGray">#}
+{#                            {{ d_product.price }}#}
+{#                            <span>تومان</span>#}
+{#                          </del>#}
+{#                          <span#}
+{#                            class="px-2 text-sm text-whiteColor bg-primary rounded-2xl"#}
+{#                            >{{ d_product.discount }}%</span#}
+{#                          >#}
+{#                            {% endif %}#}
+{#                            #}
+{#                        </div>#}
+{#                          #}
+{#                        <p class="text-end">#}
+{#                          <span class="setFormatNumber">{{ d_product.discounted_price }}</span>#}
+{#                          <span>تومان</span>#}
+{#                        </p>#}
+{#                      </div>#}
+{#                    </div>#}
+{#                    <p class="text-sm text-lowBlue py-3">#}
+{#                      (1) عدد در سبد خرید شما#}
+{#                    </p>#}
+{#                  </div>#}
+{#                </div>#}
+{#                  {% endfor %}#}
+{#                  #}
+{#                  #}
+{#              </div>#}
+{#              <div class="swiper-button-prev"></div>#}
+{#              <div class="swiper-button-next"></div>#}
+{#            </div>#}
+{#          </div>#}
+{#        </div>#}
+{#      </section>#}
+    
+    
+    
+    
+    
+      <section>
+        <div class="2xl:container p-4 grid md:grid-cols-2 grid-cols-1 gap-5">
+          <a href="{% url 'products:product_list' %}?category=صبحانه" target="_blank" class="rounded-md overflow-hidden">
+            <img
+              loading="lazy"
+              src="{% static 'assets/images/2345.jpg' %}"
+              class="w-full rounded-md"
+              alt="بنر"
+            />
+          </a>
+          <a href="{% url 'products:product_list' %}?category=مواد پروتئيني و تخم مرغ" target="_blank" class="rounded-md overflow-hidden">
+            <img
+              loading="lazy"
+              src="{% static 'assets/images/743.jpg' %}"
+              class="w-full rounded-md"
+              alt="بنر"
+            />
+          </a>
+          <a href="{% url 'products:product_list' %}?category=نوشيدني" target="_blank" class="rounded-md overflow-hidden">
+            <img
+              loading="lazy"
+              src="{% static 'assets/images/خنک-بنوش.jpg' %}"
+              class="w-full rounded-md"
+              alt="بنر"
+            />
+          </a>
+          <a href="{% url 'products:product_list' %}?category=بهداشت خانگي" target="_blank" class="rounded-md overflow-hidden">
+            <img
+              loading="lazy"
+              src="{% static 'assets/images/543.jpg' %}"
+              class="w-full rounded-md"
+              alt="بنر"
+            />
+          </a>
+        </div>
+      </section>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+{#      <section>#}
+{#        <div class="2xl:container p-4">#}
+{#          <div class="bg-pinkRolor rounded-md flex flex-col gap-2 p-5">#}
+{#            <div>#}
+{#              <h1>میوه و سبزیجات</h1>#}
+{#                <br>#}
+{#              <div class="flex justify-between sm:text-md text-sm">#}
+{#                <p class="text-lowGray">مرتب سازی بر اساس جدیدترین</p>#}
+{#                <a href="#" class="text-submitPageColorBorderBlue"#}
+{#                  >مشاهده همه</a#}
+{#                >#}
+{#              </div>#}
+{#              <span#}
+{#                class="w-full block relative mb-4 bg-submitPageColorBorderLowBlack h-[2px] after:absolute after:w-[200px] after:bg-primary after:h-[2px] after:top-0 after:right-0 after:content-['']"#}
+{#              ></span>#}
+{#            </div>#}
+{#            <div class="swiper miveSabzSlider w-full">#}
+{#              <div class="swiper-wrapper select-none">#}
+{#                <div class="swiper-slide min-w-[200px] max-w-[300px]">#}
+{#                  <a#}
+{#                    href="#"#}
+{#                    class="flex h-full w-full flex-col px-2 items-center"#}
+{#                  >#}
+{#                    <img#}
+{#                      loading="lazy"#}
+{#                      src="{% static 'assets/images/goldonMiveSabz.png' %}"#}
+{#                      class="md:max-w-full max-w-[200px]"#}
+{#                      alt="سبزیجات"#}
+{#                    />#}
+{#                    <span#}
+{#                      class="border border-whiteColor rounded-md w-[142px] text-whiteColor px-4 py-2 my-4"#}
+{#                      >مشاهده همه</span#}
+{#                    >#}
+{#                  </a>#}
+{#                </div>#}
+{#                  #}
+{#                  #}
+{#                  #}
+{#                  #}
+{#                  #}
+{#                <div#}
+{#                  class="swiper-slide min-w-[200px] max-w-[300px] bg-whiteColor rounded-md overflow-hidden space-y-2 p-3"#}
+{#                >#}
+{#                  <a#}
+{#                    href="#"#}
+{#                    target="_blank"#}
+{#                    class="flex gap-2 flex-col justify-center items-center"#}
+{#                  >#}
+{#                    <img#}
+{#                      loading="lazy"#}
+{#                      class="w-[200px] min-h-[180px]"#}
+{#                      src="{% static 'assets/images/1-7491-300x300.jpg' %}"#}
+{#                      alt="عکس"#}
+{#                    />#}
+{#                    <p#}
+{#                      class="text-sm text-lowGray max-h-[45px] overflow-hidden text-ellipsis"#}
+{#                    >#}
+{#                      سبزان سبزی جعفری خشک 100گرمی#}
+{#                    </p>#}
+{#                  </a>#}
+{#                  <div class="py-2">#}
+{#                    <div class="flex gap-2 justify-between items-start">#}
+{#                      <a#}
+{#                        href="#"#}
+{#                        class="p-3 flex justify-center items-center bg-primary text-whiteColor rounded-md"#}
+{#                      >#}
+{#                        <i class="fa fa-plus"></i>#}
+{#                      </a>#}
+{#                      <div class="price">#}
+{#                        <div class="text-[12px] flex gap-2">#}
+{#                          <del class="text-mdGray">#}
+{#                            54,550#}
+{#                            <span>تومان</span>#}
+{#                          </del>#}
+{#                          <span#}
+{#                            class="px-2 text-sm text-whiteColor bg-primary rounded-2xl"#}
+{#                            >13%</span#}
+{#                          >#}
+{#                        </div>#}
+{#                        <p class="text-end">#}
+{#                          <span>54,550</span>#}
+{#                          <span>تومان</span>#}
+{#                        </p>#}
+{#                      </div>#}
+{#                    </div>#}
+{#                    <p class="text-sm text-lowBlue py-3">#}
+{#                      (1) عدد در سبد خرید شما#}
+{#                    </p>#}
+{#                  </div>#}
+{#                </div>#}
+{#                  #}
+{#                  #}
+{#                  #}
+{#                  #}
+{#                #}
+{#              </div>#}
+{#              <div class="swiper-button-prev"></div>#}
+{#              <div class="swiper-button-next"></div>#}
+{#            </div>#}
+{#          </div>#}
+{#        </div>#}
+{#      </section>#}
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      <section>
+        <div class="2xl:container p-4">
+          <img
+            loading="lazy"
+            src="{% static 'assets/images/خشکبار.jpg' %}"
+            class="w-full rounded-md"
+            alt="خشکبار"
+          />
+        </div>
+      </section>
+    
+    
+    
+{#      <section>#}
+{#        <div class="2xl:container p-4">#}
+{#          <div#}
+{#            class="bg-lowerGray boxBorder rounded-md flex flex-col gap-2 p-5"#}
+{#          >#}
+{#            <div>#}
+{#              <div class="flex justify-between">#}
+{#                <h1>پرفروش ترین ها</h1>#}
+{#                <a href="#" class="text-submitPageColorBorderBlue"#}
+{#                  >مشاهده همه</a#}
+{#                >#}
+{#              </div>#}
+{#              <span#}
+{#                class="w-full block relative mb-4 bg-submitPageColorBorderLowBlack h-[2px] after:absolute after:w-[94px] after:bg-primary after:h-[2px] after:top-0 after:right-0 after:content-['']"#}
+{#              ></span>#}
+{#            </div>#}
+{#            <div class="swiper miveSabzSlider w-full">#}
+{#              <div class="swiper-wrapper select-none">#}
+{#                  #}
+{#                  #}
+{#                  #}
+{#                <div#}
+{#                  class="swiper-slide min-w-[200px] max-w-[300px] bg-whiteColor rounded-md overflow-hidden space-y-2 p-3"#}
+{#                >#}
+{#                  <a#}
+{#                    href="#"#}
+{#                    target="_blank"#}
+{#                    class="flex gap-2 flex-col justify-center items-center"#}
+{#                  >#}
+{#                    <img#}
+{#                      loading="lazy"#}
+{#                      class="w-[200px] min-h-[180px]"#}
+{#                      src="{% static 'assets/images/6260108399909-300x300.jpg' %}"#}
+{#                      alt="عکس"#}
+{#                    />#}
+{#                    <p#}
+{#                      class="text-sm text-lowGray max-h-[45px] overflow-hidden text-ellipsis"#}
+{#                    >#}
+{#                      سبزان سبزی جعفری خشک 100گرمی#}
+{#                    </p>#}
+{#                  </a>#}
+{#                  <div class="py-2">#}
+{#                    <div class="flex gap-2 justify-between items-start">#}
+{#                      <a#}
+{#                        href="#"#}
+{#                        class="p-3 flex justify-center items-center bg-primary text-whiteColor rounded-md"#}
+{#                      >#}
+{#                        <i class="fa fa-plus"></i>#}
+{#                      </a>#}
+{#                      <div class="price">#}
+{#                        <div class="text-[12px] flex gap-2">#}
+{#                          <del class="text-mdGray">#}
+{#                            54,550#}
+{#                            <span>تومان</span>#}
+{#                          </del>#}
+{#                          <span#}
+{#                            class="px-2 text-sm text-whiteColor bg-primary rounded-2xl"#}
+{#                            >13%</span#}
+{#                          >#}
+{#                        </div>#}
+{#                        <p class="text-end">#}
+{#                          <span>54,550</span>#}
+{#                          <span>تومان</span>#}
+{#                        </p>#}
+{#                      </div>#}
+{#                    </div>#}
+{#                    <p class="text-sm text-lowBlue py-3">#}
+{#                      (1) عدد در سبد خرید شما#}
+{#                    </p>#}
+{#                  </div>#}
+{#                </div>#}
+{#                  #}
+{#                  #}
+{#                  #}
+{#              </div>#}
+{#            </div>#}
+{#          </div>#}
+{#        </div>#}
+{#      </section>#}
+    
+    
+      <section>
+        <div class="2xl:container p-4">
+          <div class="flex flex-col gap-2 p-5">
+            <div>
+              <div class="flex justify-between">
+                <h1>محبوب ترین برندها</h1>
+              </div>
+              <span
+                class="w-full block relative mb-4 h-[2px] after:absolute after:w-[130px] after:bg-primary after:h-[2px] after:top-0 after:right-0 after:content-['']"
+              ></span>
+            </div>
+          
+          
+            <div class="swiper miveSabzSlider w-full">
+              <div class="swiper-wrapper select-none">
+                
+                  
+                  
+                  {% for brand in brands %}
+                <div
+                  class="swiper-slide min-w-[200px] max-w-[300px] rounded-md overflow-hidden space-y-2 p-3 boxBorder"
+                >
+                  <div class="flex justify-center items-center">
+                    <img
+                      loading="lazy"
+                      class="max-w-full w-[113px]"
+                      src="{{ brand.image }}"
+                      alt="{{ brand.name }}"
+                    />
+                  </div>
+                </div>
+                  {% endfor %}
+                  
+                  
+                  
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    
+    
+    
+    
+    
+    
+ {% endblock %}
+
+{% block scripts %} 
+    <script>
+        class Swiper {
+            constructor(s, param2) {
+                
+            }
+
+        }
+
+        const sw = new Swiper(".firstSectionSlider", {
+        direction: "horizontal",
+        rtl: true,
+        loop: true,
+        slidesPerView: 1,
+        spaceBetween: 10,
+        effect: "fade",
+        fadeEffect: {
+          crossFade: true,
+        },
+        speed: 2500,
+        autoplay: {
+          delay: 5000,
+        },
+      });
+          
+      const swiper = new Swiper(".miveSabzSlider", {
+        direction: "horizontal",
+        rtl: true,
+        loop: false,
+        breakpoints: {
+          1400: {
+            slidesPerView: 6,
+            spaceBetween: 10,
+            width: null,
+          },
+          1200: {
+            slidesPerView: 5,
+            spaceBetween: 10,
+            width: null,
+          },
+          1024: {
+            slidesPerView: 4,
+            spaceBetween: 10,
+            width: null,
+          },
+          768: {
+            slidesPerView: 3,
+            spaceBetween: 10,
+            width: null,
+          },
+          0: {
+            slidesPerView: "auto",
+            spaceBetween: 5,
+            width: 200,
+          },
+        },
+        freeMode: {
+          enabled: true,
+          sticky: true,
+        },
+        navigation: {
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev",
+        },
+      });
+      swiper.forEach((obj) => {
+        if (obj.length === 0) {
+          $(".swiper-button-next").remove();
+          $(".swiper-button-prev").remove();
+        } else if (obj.activeIndex === 0) {
+          $(".swiper-button-next").hide();
+          $(".swiper-button-prev").show();
+        } else if (obj.activeIndex === obj.length - 1) {
+          $(".swiper-button-next").show();
+          $(".swiper-button-prev").hide();
+        }
+      });
+    </script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+

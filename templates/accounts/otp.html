@@ -1,0 +1,64 @@
+{% extends 'accounts_base.html' %}
+{% load static %}
+
+
+{% block title %}
+    تایید کد
+{% endblock %}
+
+
+
+{% block form %}
+      <section>
+        <div class="flex flex-col gap-10">
+          <h1 class="text-xl text-lowGray">کد تایید را وارد کنید</h1>
+          <div>
+            <label for="input" class="text-sm text-lowGray">
+              کد تایید به شماره <span>{{ user_phone_number }}</span> پیامک شد
+            </label>
+          </div>
+          <form method="post">
+                  {% csrf_token %}
+                  {{ form.code }}
+                  {{ form.code.errors }}
+              <a class="text-center text-sm">
+                ارسال مجدد کد تا
+                <span id="timer"></span>
+                دیگر
+              </a>
+                  </br></br>
+                  
+              <button type="submit"
+                class="bg-redColor opacity-80 hover:opacity-100 transition-opacity duration-300 text-whiteColor py-3 w-full rounded-md"
+              >
+                ورود
+            </button>
+          </form>
+        </div>
+      </section>
+
+{% endblock %}
+
+
+
+{% block scripts %}
+    <script>
+      const timerLink = document.querySelector("#timer");
+
+      let sec = {{ total_seconds }};
+      let linkHref = "{% url 'auth:resend_otp' %}";
+      function timer() {
+        if (sec <= 0) {
+          timerLink.parentElement.href = linkHref;
+          timerLink.parentElement.textContent = "دریافت مجدد کد تایید";
+          clearInterval(interval);
+          return;
+        }
+        sec--;
+
+        timerLink.textContent = sec;
+      }
+      interval = setInterval(() => timer(), 1000);
+      timer();
+    </script>
+{% endblock %}

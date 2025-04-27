@@ -1,0 +1,14 @@
+venv
+static/
+staticfiles/
+media/
+__pycache__/
+
+# Ignore all __pycache__ directories
+**/__pycache__/
+
+# Ignore all .pyc files
+*.pyc
+
+cron.log
+cron.log

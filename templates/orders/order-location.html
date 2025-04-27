@@ -1,0 +1,85 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fa">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>موقعیت مکانی سفارش</title>
+    <link rel="stylesheet" href="{% static 'styles/openlayers.css' %}" />
+    <script src="{% static 'scripts/openlayers.js' %}"></script>
+    <style>
+      body {
+        height: 100vh;
+        width: 100vw;
+        margin: 0;
+      }
+
+      #map {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+  
+  
+  {% if not location or location == 'null' %}
+            
+      <h1>!موقعیت مکانی برای این سفارش ثبت نشده است</h1>
+      
+  {% else %}
+      
+  
+    <div id="map"></div>
+    <script type="text/javascript">
+      let apiWeb = "web.e8b01a5c76134dccaae6f10a58ae9341";
+      let x = {{ location.0 }};
+      let y = {{ location.1 }};
+
+      var neshanMap = new ol.Map({
+        target: "map",
+        key: apiWeb,
+        maptype: "neshan",
+        poi: false,
+        traffic: false,
+        view: new ol.View({
+          center: ol.proj.fromLonLat([x, y]),
+          zoom: 14,
+        }),
+      });
+
+      let marker = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([x, y])),
+      });
+
+      marker.setStyle(
+        new ol.style.Style({
+          image: new ol.style.Icon({
+            anchor: [0.5, 1],
+            scale: 0.5,
+            src: "{% static 'assets/images/marker-icon-2x-red.png' %}",
+          }),
+        })
+      );
+
+      let vectorSource = new ol.source.Vector({
+        features: [marker],
+      });
+
+      vectorLayer = new ol.layer.Vector({
+        source: vectorSource,
+      });
+
+      neshanMap.addLayer(vectorLayer);
+    </script>
+
+  {% endif%}
+  
+  </body>
+</html>

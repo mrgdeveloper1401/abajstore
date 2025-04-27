@@ -1,0 +1,20 @@
+from django.urls import path
+from .views import *
+
+app_name = 'orders'
+urlpatterns = [
+    path('orders/', OrderListView.as_view(), name='order_list'),
+    path('orders/<int:order_id>/', OrderDetailView.as_view(), name='order_detail'),
+    path('orders/checkout/', CheckoutView.as_view(), name='checkout'),
+
+    path('orders/<int:order_id>/pay-at-home/', PayAtHomeView.as_view(), name='pay_at_home'),
+    path('orders/<int:order_id>/pay/', PayOrderView.as_view(), name='pay_order'),
+    path('orders/<int:order_id>/pay/mellat/', MellatPayOrderView.as_view(), name='mellat_pay_order'),
+    path('orders/callback/', PaymentCallbackView.as_view(), name='pay_call_back'),
+    path('orders/callback/mellat/', MellatPaymentCallbackView.as_view(), name='mellat_pay_call_back'),
+    path('orders/<int:order_id>/result/', PayOrderResultView.as_view(), name='pay_result'),
+    path('api/invoices/', InvoiceViewSet.as_view({'get': 'list', 'post': 'create'}), name='invoice-list'),
+    path('api/invoices/<int:pk>/', InvoiceViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='invoice-detail'),
+    path('api/invoices/unprinted/', InvoiceViewSet.as_view({'get': 'unprinted'}), name='invoice-unprinted'),
+    path('<int:order_id>/', GetOrderLocation.as_view(), name='order_location'),
+]

@@ -1,0 +1,968 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+
+
+{% block title %} تکمیل سفارش {% endblock %}
+
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'styles/jalalidatepicker.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'styles/openlayers.css' %}" />
+    <script src="{% static 'scripts/openlayers.js' %}"></script>
+{% endblock %}
+
+
+
+
+{% block content %} 
+
+    
+<style>
+.checkOutliAviActive {
+    background-color: #ec1d37bf; /* رنگ پیش‌فرض */
+    padding: 5px;
+    text-align: center;
+    cursor: pointer;
+    position: relative; /* موقعیت نسبی برای مدیریت عناصر داخلی */
+    border-radius: 5px; /* گوشه‌های گرد */
+}
+.checkOutliAviActive.active::after {
+      content: ""; /* ایجاد خط */
+      position: absolute;
+      bottom: -5px; /* فاصله خط از المان */
+      left: 0;
+      right: 0;
+      height: 3px; /* ضخامت خط */
+      background-color: orange; /* رنگ خط */
+    }
+.checkOutDaysActive {
+    background-color: #fb2742b8; /* رنگ خاص برای المان فعال */
+    padding: 5px;
+    text-align: center;
+    cursor: pointer;
+    position: relative; /* موقعیت‌دهی مشابه */
+    border-radius: 5px; /* گوشه‌های گرد */
+}
+</style>
+    
+    
+
+    <main class="lg:pt-[140px]">
+      <section
+        id="hiddenContent"
+        class="bg-lowOpacityColorBg items-start hidden fixed z-[9] top-0 right-0 w-full h-screen"
+      ></section>
+      <section>
+        <div
+          class="container flex gap-2 text-lowGray text-[12px] text-nowrap overflow-auto"
+        >
+          <a href="{% url 'products:home' %}">صفحه اصلی</a>
+          <span class="select-none">/</span>
+          <a href="{% url 'carts:all' %}">سبد خرید</a>
+          <span class="select-none">/</span>
+          <p>تکمیل سفارش</p>
+        </div>
+      </section>
+      <section
+        id="hiddenContent"
+        class="bg-lowOpacityColorBg items-start hidden fixed z-[9] top-0 right-0 w-full h-screen"
+      ></section>
+    
+    
+    {% if not carts %}
+          <div class="sm:text-lg text-sm divTextAlert danger">
+            <p>محصولی برای تکمیل سفارش یافت نشد!</p>
+          </div>
+    {% else %}
+        
+        
+        
+    
+    
+    
+    
+      <section>
+        <form method="post" 
+          class="justify-center container flex lg:flex-row items-start flex-col p-2 gap-5"
+        >
+                  {% csrf_token %}
+        
+          <div
+            class="flex flex-col w-full gap-4 divide-submitPageColorBorderLowBlack"
+          >
+          
+          <div
+              class="w-full border-b-4 border-submitPageColorBorderLowBlack lg:border-0 space-y-5 lg:boxBorder rounded-md p-3"
+            >
+              <h2 class="flex flex-col gap-2 py-4 w-[max-content]">
+                <span>زمان و روش ارسال سفارش:</span>
+                <span class="w-1/3 bg-primary h-[2px]"></span>
+              </h2>
+              <div class="space-y-4">
+                <div class="space-y-4">
+{#                  <p class="opacity-60">#}
+{#                    مرسوله <span>1</span> از <span>1</span> (ارسال عادی)#}
+{#                  </p>#}
+                  <select
+                    name=""
+                    id="sendProductsType"
+                    class="px-2 rounded-md boxBorder w-full py-2 outline-none border border-[transparent] transition-all focus:border-submitPageColorBorderBlue"
+                  >
+                    <option value="ارسال زماندار">ارسال زماندار</option>
+                    <option value="ارسال فوری">ارسال فوری</option>
+                  </select>
+                </div>
+                <div
+                  class="boxBorder rounded-md py-2 divide-y divide-submitPageColorBorderLowBlack px-2"
+                >
+                  <div>
+                    <ul
+                      class="flex flex-wrap gap-2 text-sm"
+                      id="daysSendProducts"
+                    >
+                    
+                    {% for day in next_5_days %}
+                      <li
+                        dateText="{{ day.date }}"
+                        class="checkOutDaysBaseStyle {% if forloop.counter == 1 %}checkOutDaysActive{% endif %}"
+                        data-dayId="{{ day.day_in_month }}"
+                      >
+                        <span>{{ day.weekday }}</span>
+                        <span>{{ day.day_in_month }}</span>
+                      </li>
+                      {% endfor %}
+                      
+                    </ul>
+                  </div>
+                  <div class="py-2">
+                  
+                    {% for day in next_5_days %}
+                    <ul data-uldayId="{{ day.day_in_month }}" 
+                    class="{% if forloop.counter == 1 %}flex{% else %}hidden{% endif %} w-full flex-wrap gap-2">
+                      <li dayText="1" class="checkOutliBaseStyle checkOutliAvi">
+                        <span>8:00</span>
+                        <span>تا</span>
+                        <span>10:00</span>
+                      </li>
+                      <li dayText="2" class="checkOutliBaseStyle checkOutliAvi">
+                        <span>10:00</span>
+                        <span>تا</span>
+                        <span>12:00</span>
+                      </li>
+                      <li dayText="3" class="checkOutliBaseStyle checkOutliAvi">
+                        <span>12:00</span>
+                        <span>تا</span>
+                        <span>14:00</span>
+                      </li>
+                      <li dayText="4" class="checkOutliBaseStyle checkOutliAvi">
+                        <span>14:00</span>
+                        <span>تا</span>
+                        <span>16:00</span>
+                      </li>
+                      <li dayText="5" class="checkOutliBaseStyle checkOutliAvi">
+                        <span>16:00</span>
+                        <span>تا</span>
+                        <span>18:00</span>
+                      </li>
+                      <li dayText="6" class="checkOutliBaseStyle checkOutliAvi">
+                        <span>18:00</span>
+                        <span>تا</span>
+                        <span>20:00</span>
+                      </li>
+                      <li dayText="7" class="checkOutliBaseStyle checkOutliAvi">
+                        <span>20:00</span>
+                        <span>تا</span>
+                        <span>22:00</span>
+                      </li>
+                      <li dayText="8" class="checkOutliBaseStyle checkOutliAvi">
+                        <span>22:00</span>
+                        <span>تا</span>
+                        <span>24:00</span>
+                      </li>
+                    </ul>
+                      {% endfor %}
+                    
+                  </div>
+                </div>
+                
+
+
+                
+{#                <ul class="flex gap-2 flex-wrap">#}
+{#                #}
+{#                  <li class="w-[120px] h-[120px]">#}
+{#                    <a href="#" class="h-full inline-block">#}
+{#                      <img src="" alt="محصول" width="120" height="120" />#}
+{#                    </a>#}
+{#                  </li>#}
+{#                  #}
+{#                </ul>#}
+              </div>
+                  {{ form.non_field_errors }}
+                  {{ form.delivery_date.errors }}
+                  {{ form.time_slot.errors }}
+                  {{ form.delivery_type.errors }}
+            </div>
+           </div>
+
+{#            <div#}
+{#              class="w-full border-b-4 border-submitPageColorBorderLowBlack lg:border-0 space-y-5 lg:boxBorder rounded-md p-3"#}
+{#            >#}
+{#              <h2 class="flex flex-col gap-2 py-4 w-[max-content]">#}
+{#                <span>آدرس تحویل سفارش را انتخاب کنید:</span>#}
+{#                <span class="w-1/3 bg-primary h-[2px]"></span>#}
+{#              </h2>#}
+{#              <div class="space-y-4">#}
+{#                <div class="relative flex">#}
+{#                  <select#}
+{#                    type="text"#}
+{#                    id="statusSelect"#}
+{#                    name="status"#}
+{#                    class="hidden"#}
+{#                    value="all"#}
+{#                  >#}
+{#                    <option value="all">همه</option>#}
+{#                  </select>#}
+{#                  <div#}
+{#                    id="statusSelectCont"#}
+{#                    class="outline-none select-none relative z-[1] cursor-pointer p-2 rounded border-2 bg-whiteColor border-submitPageColorBorderLowBlack focus:border-2 focus:border-submitPageColorBorderBlue sm:max-w-[300px] w-full"#}
+{#                  >#}
+{#                    همه#}
+{#                  </div>#}
+{#                  <div#}
+{#                    id="statusSelectOptions"#}
+{#                    class="absolute z-[2] top-[0px] right-0 border-submitPageColorBorderBlue border hidden"#}
+{#                  >#}
+{#                    <ul#}
+{#                      class="max-h-[150px] overflow-auto bg-whiteColor flex flex-col"#}
+{#                    >#}
+{#                      <li valueli="all" class="p-2 liActive">همه</li>#}
+{#                      <li valueli="value2" class="p-2">در انتضار پرداخت</li>#}
+{#                      <li valueli="value3" class="p-2">در حال پردازش</li>#}
+{#                      <li valueli="value4" class="p-2">پردازش شده</li>#}
+{#                      <li valueli="value5" class="p-2">تحویل داده شده</li>#}
+{#                    </ul>#}
+{#                  </div>#}
+{#                </div>#}
+{##}
+{#                <ul class="flex flex-wrap gap-2">#}
+{#                  <li#}
+{#                    id="addressCont"#}
+{#                    class="cursor-pointer boxBorder relative flex items-center justify-center rounded-md min-h-[200px] max-w-[300px] w-full"#}
+{#                  >#}
+{#                    <i class="fa fa-plus"></i>#}
+{#                    <span>افزودن ادرس</span>#}
+{#                  </li>#}
+{#                </ul>#}
+{#              </div>#}
+{#            </div>#}
+{#            </div>#}
+              
+              
+              
+{#            <div#}
+{#              class="w-full border-b-4 border-submitPageColorBorderLowBlack lg:border-0 space-y-5 lg:boxBorder rounded-md p-3"#}
+{#            >#}
+{#              <h2 class="flex flex-col gap-2 py-4 w-[max-content]">#}
+{#                <span>توضیحات سفارش (اختیاری):</span>#}
+{#                <span class="w-1/3 bg-primary h-[2px]"></span>#}
+{#              </h2>#}
+{#                <textarea#}
+{#                  name="user_dsc_textArea"#}
+{#                  id="user_dsc_textArea"#}
+{#                  class="w-full resize-y boxBorder h-[300px] border-submitPageColorBorderLowBlack border-2 py-2 px-2 outline-none focus:border-submitPageColorBorderBlue transition-[border]"#}
+{#                >#}
+{#                </textarea>#}
+{#            </div>#}
+{#          </div>#}
+        
+{#        <div#}
+{#              class="w-full border-b-4 border-submitPageColorBorderLowBlack lg:border-0 space-y-5 lg:boxBorder rounded-md p-3"#}
+{#            >#}
+{#              <h2 class="flex flex-col gap-2 py-4 w-[max-content]">#}
+{#                <span>توضیحات سفارش (اختیاری):</span>#}
+{#                <span class="w-1/3 bg-primary h-[2px]"></span>#}
+{#              </h2>#}
+{#              <form>#}
+{#                  {% csrf_token %}#}
+{#                <textarea#}
+{#                  name="user_dsc_textArea"#}
+{#                  id="user_dsc_textArea"#}
+{#                  class="w-full resize-y boxBorder h-[300px] border-submitPageColorBorderLowBlack border-2 py-2 px-2 outline-none focus:border-submitPageColorBorderBlue transition-[border]"#}
+{#                >#}
+{#                </textarea>#}
+{#              </form>#}
+{#            </div>#}
+{#            </div>#}
+        
+        
+        
+          <aside
+            class="lg:max-w-[450px] lg:block w-full boxBorder rounded-md py-2 px-4"
+          >
+            <nav>
+              <h1 class="relative w-max flex py-2">
+                سفارش شما
+                <span
+                  class="absolute w-[80%] bottom-0 right-0 border border-primary"
+                ></span>
+              </h1>
+              <div
+                class="border-b-[6px] divide-y divide-submitPageColorBorderLowBlack text-lowGray py-2 border-submitPageColorBorderLowBlack flex flex-col gap-4"
+              >
+                <div class="flex justify-between text-blackColor">
+                  <span>نام محصول</span>
+                  <span>جمع</span>
+                </div>
+                <ul
+                  class="space-y-3 text-sm divide-y divide-submitPageColorBorderLowBlack"
+                >
+                    
+                    {% for cart in carts %}
+                  <li class="flex justify-between py-2">
+                    <span class="max-w-[200px]"
+                      >{{ cart.product.name }}  × {{ cart.rounded_quantity }} 
+                        {% if cart.product.unit_type == 1 %} عدد {% else %} کیلو {% endif %}
+                        
+                    </span>
+                    <span class="">{{ cart.cart_item_price }}<span> تومان </span></span>
+                  </li>
+                    {% endfor %}
+
+                    
+                </ul>
+                <div class="flex justify-between text-blackColor">
+                  <span>جمع</span>
+                  <span class="">{{ cart.calculate_total_price }}<span> تومان </span></span>
+                </div>
+              
+              
+                    {% if cart.calculate_total_discount %}
+                <div
+                  data-dec="for show replace hidden with flex"
+                  class="flex justify-between text-primary"
+                >
+                  <span>تخفیف</span>
+                  <span class="">{{ cart.calculate_total_discount }}<span> تومان </span></span>
+                </div>
+                    {% endif %}
+              
+              
+                <div class="flex justify-between">
+                  <span>
+                      هزینه ارسال
+                    <span class="text-sm px-2 text-[aqua]">{{ carts.count }} مرسوله</span>
+                  </span>
+                     {% if cart.send_price %}
+                  <span class="">{{ cart.send_price }}<span> تومان </span></span>
+                     {% else %}
+                  <span class="collectPrice">0<span></span></span>
+                     {% endif %}
+                </div>
+
+                <div class="flex justify-between text-blackColor">
+                  <span>مبلغ قابل پرداخت </span>
+                  <span class="collectPrice ">{{ cart.calculate_total_discounted_price }}<span> تومان </span></span>
+                </div>
+              </div>
+            
+            
+            
+              <div class="flex flex-col gap-4 py-4" >
+                  
+                <div class="space-y-4">
+                  <a href="#" class="text-lowBlue" id="addressCont"
+                    >اضافه کردن آدرس جدید</a
+                  >
+                  <div class="relative flex">
+                      <p>ارسال به : </p>
+                      
+                  {{ form.address }}
+                  {{ form.address.errors }}
+                      
+                      
+                      
+                      
+                      
+{#                  <select#}
+{#                    id="addressSelect"#}
+{#                    name="address"#}
+{#                    class="form-select block w-full mt-1"#}
+{#                    required#}
+{#                  >#}
+{#                    {% for address in form.address.field.queryset %}#}
+{#                      <option value="{{ address.id }}">{{ address }}</option>#}
+{#                    {% empty %}#}
+{#                      <option value="">هیچ آدرسی یافت نشد</option>#}
+{#                    {% endfor %}#}
+{#                  </select>#}
+                      
+                  
+                      
+                      
+                      
+{#                    <select#}
+{#                      type="text"#}
+{#                      id="statusSelect"#}
+{#                      name="status"#}
+{#                      class=""#}
+{#                      value=""#}
+{#                    >#}
+{#                      <option value="all">----</option>#}
+{##}
+{#                    </select>#}
+
+                      
+{#                    <div#}
+{#                      id="statusSelectCont"#}
+{#                      class="outline-none select-none relative z-[1] cursor-pointer p-2 rounded border-2 bg-whiteColor border-submitPageColorBorderLowBlack focus:border-2 focus:border-submitPageColorBorderBlue sm:max-w-[300px] w-full"#}
+{#                    >#}
+{#                      {{ address }}#}
+{#                    </div>#}
+{#                    <div#}
+{#                      id="statusSelectOptions"#}
+{#                      class="absolute z-[2] top-[0px] right-0 border-submitPageColorBorderBlue border hidden"#}
+{#                    >#}
+{#                      <ul#}
+{#                        class="max-h-[150px] overflow-auto bg-whiteColor flex flex-col"#}
+{#                      >#}
+                      
+                      
+{#                      {% for address in form.address.field.queryset %}#}
+{#                            <li valueli="value{{ address.id }}" class="p-2 liActive">{{ address }}</li>#}
+{#                        {% empty %}#}
+{#                            <li valueli="" class="p-2">یک آدرس اضافه کنید</li>#}
+{#                        {% endfor %}#}
+                  
+{#                      </ul>#}
+{#                    </div>#}
+                  </div>
+                </div>
+
+
+                  {% if pay_at_home %}
+                    <label for="id_pay_method_0" class="payMethodCheckBox">
+                      <input
+                        type="radio"
+                        name="pay_method"
+                        value="پرداخت درب منزل"
+                        id="id_pay_method_0"
+                        
+                      />
+                      <span class="checkmark"></span>
+                      <span class="px-10">پرداخت درب منزل</span>
+                      <div class="dropDownPayMethod">
+                        پرداخت با دستگاه کارتخوان
+                      </div>
+                    </label>
+                  {% endif %}
+                  
+                  
+                  {% if pay_with_parsian %}
+                    <label for="id_pay_method_1" class="payMethodCheckBox">
+                      <input
+                        type="radio"
+                        name="pay_method"
+                        value="درگاه پارسیان"
+                        id="id_pay_method_1"
+                        
+                      />
+                      <span class="checkmark"></span>
+                      <span class="px-10">درگاه پارسیان</span>
+                      <div class="dropDownPayMethod">
+                        پرداخت با تمامی کارت های عضو شتاب
+                      </div>
+                    </label>
+                  {% endif %}
+                 
+                 
+                  {% if pay_with_mellat %}
+                    <label for="id_pay_method_2" class="payMethodCheckBox">
+                      <input
+                        type="radio"
+                        name="pay_method"
+                        value="درگاه بانک ملت"
+                        id="id_pay_method_2"
+    
+                      />
+                      <span class="checkmark"></span>
+                      <span class="px-10">درگاه ملت</span>
+                      <div class="dropDownPayMethod">
+                        پرداخت با تمامی کارت های عضو شتاب
+                      </div>
+                    </label>
+                  {% endif %}
+                  
+                  
+                <button type="submit"
+                  id="submitProducts"
+                  class="bg-redColor opacity-80 hover:opacity-100 transition-opacity duration-300 text-whiteColor py-3 w-full rounded-md"
+                >
+                  پرداخت
+                </button>
+              </div>
+            
+            
+            
+            
+            </nav>
+          </aside>
+        
+          <div class="hidden">
+            <label for="sendTypeProduct"></label><input type="text" name="delivery_type" id="sendTypeProduct" value=""/>
+            <label for="dateSendPorduct"></label><input type="text" name="delivery_date" id="dateSendPorduct" value=""/>
+            <label for="hourSendProduct"></label><input type="number" name="time_slot" id="hourSendProduct" value=""/>
+          </div>
+
+
+        
+        </form>
+      </section>
+    
+    {% endif %}
+    
+      <section
+        id="editCard"
+        class="filterContWithAnimate hidden items-center justify-center bg-lowOpacityColorBg absolute w-full h-screen top-0 left-0 z-[100] showFilterSec"
+      >
+        <div
+          class="flex flex-col relative gap-4 text-sm bg-whiteColor h-full lg:h-max p-4 rounded-md lg:min-h-[400px] max-h-[500px]  lg:w-1/2 w-full"
+        >
+          <div
+            class="flex absolute right-0 px-4 z-10 bg-whiteColor top-0 w-full justify-between items-center border-b-4 border-submitPageColorBorderLowBlack py-2"
+          >
+            <h1>اضافه کردن آدرس</h1>
+            <button id="closeWindow"><i class="fa fa-remove"></i></button>
+          </div>
+          <form method="post" style="padding-top: 160px;" action="{% url 'auth:address_create' %}"
+            class="sm:pb-[10px] pb-[60px] overflow-y-auto space-y-4"
+          >
+              {% csrf_token %}
+{#            <div class="flex flex-col sm:flex-row gap-4">#}
+{#              <div class="flex flex-col basis-[50%] py-2">#}
+{#                <label>#}
+{#                  استان#}
+{#                  <strong class="text-primary">*</strong>#}
+{#                </label>#}
+{#                <select#}
+{#                  name="asd"#}
+{#                  disabled="true"#}
+{#                  class="cursor-not-allowed bg-lowerGray p-2"#}
+{#                >#}
+{#                  <option value="yazd">یزد</option>#}
+{#                </select>#}
+{#              </div>#}
+{#              <div class="flex flex-col basis-[50%] py-2">#}
+{#                <label for="user_city">#}
+{#                  شهر#}
+{#                  <strong class="text-primary">*</strong>#}
+{#                </label>#}
+{#                <select id="user_city" name="asd" class="bg-lowerGray p-2">#}
+{#                  <option value="">شهر</option>#}
+{#                </select>#}
+{#              </div>#}
+{#            </div>#}
+            <div>
+              <label for="receiver_name">
+                  نام گیرنده
+                <strong class="text-primary">*</strong>
+              </label>
+                {{ new_address_form.receiver_name }}
+                {{ new_address_form.receiver_name.errors }}
+{#              <input#}
+{#                type="text"#}
+{#                name="user_addres"#}
+{#                class="border-submitPageColorBorderLowBlack border-2 w-full py-2 px-2 outline-none focus:border-submitPageColorBorderBlue transition-all"#}
+{#                id="user_addres"#}
+{#              />#}
+            </div>
+            <div>
+              <label for="phone_number">
+                شماره گیرنده
+                <strong class="text-primary">*</strong>
+              </label>
+                {{ new_address_form.phone_number }}
+                {{ new_address_form.phone_number.errors }}
+{#              <input#}
+{#                type="text"#}
+{#                name="user_postCode"#}
+{#                class="border-submitPageColorBorderLowBlack border-2 w-full py-2 px-2 outline-none focus:border-submitPageColorBorderBlue transition-all"#}
+{#                id="user_postCode"#}
+{#              />#}
+            </div>
+            <div>
+              <label for="city">
+                شهر
+                <strong class="text-primary">*</strong>
+              </label>
+                {{ new_address_form.city }}
+                {{ new_address_form.city.errors }}
+{#              <input#}
+{#                type="text"#}
+{#                name="user_number"#}
+{#                class="border-submitPageColorBorderLowBlack border-2 w-full py-2 px-2 outline-none focus:border-submitPageColorBorderBlue transition-all"#}
+{#                id="user_number"#}
+{#              />#}
+            </div>
+            <div>
+              <label for="address">
+                آدرس
+                <strong class="text-primary">*</strong>
+              </label>
+                {{ new_address_form.address }}
+                {{ new_address_form.address.errors }}
+{#              <input#}
+{#                type="text"#}
+{#                name="user_name"#}
+{#                class="border-submitPageColorBorderLowBlack border-2 w-full py-2 px-2 outline-none focus:border-submitPageColorBorderBlue transition-all"#}
+{#                id="user_name"#}
+{#              />#}
+            </div>
+            <div>
+              <label for="postalcode">
+                کد پستی
+              <strong class="text-lowGreenColor">(اختیاری)</strong>
+              </label>
+                {{ new_address_form.postalcode }}
+                {{ new_address_form.postalcode.errors }}
+{#              <input#}
+{#                type="text"#}
+{#                name="user_last_name"#}
+{#                class="border-submitPageColorBorderLowBlack border-2 w-full py-2 px-2 outline-none focus:border-submitPageColorBorderBlue transition-all"#}
+{#                id="user_last_name"#}
+{#              />#}
+            </div>
+            <div>
+              <label for="note">
+                یادداشت
+              <strong class="text-lowGreenColor">(اختیاری)</strong>
+              </label>
+                {{ new_address_form.note }}
+                {{ new_address_form.note.errors }}
+{#              <input#}
+{#                type="text"#}
+{#                name="user_last_name"#}
+{#                class="border-submitPageColorBorderLowBlack border-2 w-full py-2 px-2 outline-none focus:border-submitPageColorBorderBlue transition-all"#}
+{#                id="user_last_name"#}
+{#              />#}
+            </div>
+            
+            
+            <div id="map" class="w-[90%] mx-auto h-[300px]"></div>
+                {{ new_address_form.location }}
+                {{ new_address_form.location.errors }}
+{#            <input type="hidden" name="offsets" id="offsetsMap" />#}
+            
+            
+            <div
+              class="flex gap-2 px-4 z-10 bg-whiteColor w-full justify-end items-center py-2"
+            >
+              <button
+                type="button"
+                id="closeAddresCont"
+                class="bg-lowerGray py-3 px-5 rounded-md"
+              >
+                بستن
+              </button>
+              <button
+                type="submit"
+                id="setAddres"
+                class="bg-redColor opacity-80 hover:opacity-100 transition-opacity duration-300 text-whiteColor py-3 px-5 rounded-md"
+              >
+                ثبت
+              </button>
+            </div>
+          </form>
+            
+            
+            
+        </div>
+      </section>
+    </main>
+  
+  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+{% endblock %}
+
+
+
+
+
+{% block scripts %} 
+        <script>
+let interValOpenEditCard = null;
+let isTouchLi = false;
+let apiService = "service.1d6799984e2b455996701efdd5b38c4c";
+let apiWeb = "web.e8b01a5c76134dccaae6f10a58ae9341";
+let neshanMap;
+
+function clickLiHand(nameCont, li, showClass, select, statusCont, isLi = true) {
+  document.querySelector(nameCont).classList.remove(showClass);
+  document.querySelector(nameCont).classList.add("hidden");
+  if (!isLi) return;
+  isTouchLi = true;
+  select.options[0].textContent = li.textContent;
+  select.options[0].value = li.getAttribute("valueli");
+  select.value = select.options[0].value;
+  statusCont.text(li.textContent);
+}
+
+function searchLi(arr, select) {
+  arr.forEach((li) => {
+    if (select.innerText === li.innerText) {
+      li.classList.add("liActive");
+    } else {
+      li.classList.remove("liActive");
+    }
+  });
+}
+function resizestatusSelectCont() {
+  $("#statusSelectOptions").css(
+    "width",
+    $("#statusSelectCont")[0].scrollWidth + "px"
+  );
+  $("#statusSelectOptions").css(
+    "top",
+    $("#statusSelectCont")[0].scrollHeight + "px"
+  );
+}
+
+(async function () {
+  try {
+    let res = await (await fetch("/yazdCity.json")).json();
+    let option = $("<option value=''>شهر</option>");
+    $("#city").empty();
+    $("#city").append(option);
+    res.forEach((item) => {
+      option = $(`<option value='${item.cityName}'>${item.cityName}</option>`);
+      $("#city").append(option);
+    });
+  } catch {}
+})();
+
+function closeSectionFilters(interVal, filterCont, classes) {
+  if (interVal) clearInterval(interVal);
+  filterCont.removeClass(classes[0]);
+  filterCont.addClass(classes[1]);
+  interVal = setTimeout(() => {
+    interVal = null;
+    filterCont.removeClass(classes[1]);
+    filterCont.addClass(classes[2]);
+    document.body.classList.remove("overflow-hidden");
+  }, 500);
+}
+$("#addressCont").on("click", async function () {
+  $("#editCard").addClass("showFilterSec");
+  $("#editCard").removeClass("hidden");
+  $("#editCard").addClass("flex");
+  document.body.classList.add("overflow-hidden");
+  $("#map").empty();
+  neshanMap = new ol.Map({
+    target: "map",
+    key: apiWeb, // Get your own API Key on https://platform.neshan.org/panel
+    maptype: "neshan",
+    poi: false,
+    traffic: false,
+    view: new ol.View({
+      center: ol.proj.fromLonLat([54.36241555, 31.888434099999998]),
+      zoom: 14,
+    }),
+  });
+  neshanMap.on("click", mapClickHand);
+});
+$("#editCard ,  #closeAddresCont,#closeWindow ").on("click", function (e) {
+  if (
+    this === e.target ||
+    this.id === "closeAddresCont" ||
+    this.id === "closeWindow"
+  ) {
+    closeSectionFilters(interValOpenEditCard, $("#editCard"), [
+      "showFilterSec",
+      "hideFilterSec",
+      "hidden",
+    ]);
+  }
+});
+
+
+$("#user_dsc_textArea").on("keyup", function () {
+  $("#user_dsc").val(encodeURIComponent(this.value.trim()));
+});
+$(".onlyPersianLetters").on("input", function (e) {
+  const persianAndNumbersPattern = /^[\u0600-\u06FF0-9\s]+$/;
+  if (!persianAndNumbersPattern.test(this.value)) {
+    this.value = this.value.replace(/[^ا-ی0-9\s]/g, "");
+  }
+});
+let sendProductPriceBackUp = 1000;
+let sendProductPrice = 0;
+$("#sendProductsType").change(function () {
+  if (this.children[1].selected) {
+    this.parentElement.nextElementSibling.classList.add("hidden");
+    sendProductPrice = sendProductPriceBackUp;
+  } else {
+    this.parentElement.nextElementSibling.classList.remove("hidden");
+    sendProductPrice = -sendProductPriceBackUp;
+  }
+  collectPriceHand();
+});
+
+$("#dateSendPorduct").val(
+  $(`li[data-dayId].checkOutDaysActive`)[0].getAttribute("dateText")
+);
+
+$("#daysSendProducts li").click(function () {
+  let dayId = this.dataset.dayid;
+
+  $(`li[data-dayId]`).removeClass("checkOutDaysActive");
+  $(`li[data-dayId=${dayId}]`).addClass("checkOutDaysActive");
+
+  $(`ul[data-uldayId]`).removeClass("flex");
+  $(`ul[data-uldayId]`).addClass("hidden");
+  $(`ul[data-uldayId=${dayId}]`).removeClass("hidden");
+  $(`ul[data-uldayId=${dayId}]`).addClass("flex");
+
+  $("#dateSendPorduct").val(this.getAttribute("dateText"));
+});
+
+$(`ul[data-uldayId] li:not(.checkOutliUnAvi)`).click(function () {
+  $(`ul[data-uldayId] li:not(.checkOutliUnAvi)`).removeClass(
+    "checkOutliAviActive"
+  );
+  this.classList.add("checkOutliAviActive");
+  $("#hourSendProduct").val(this.getAttribute("dayText"));
+});
+$("#sendTypeProduct").val($("#sendProductsType")[0].value);
+$("#sendProductsType").change(function () {
+  $("#sendTypeProduct").val(this.value);
+});
+
+function collectPriceHand() {
+  Array.from($(".collectPrice")).forEach((item) => {
+    let num = Number(item.textContent.replace(/\,/g, "").replace("تومان", ""));
+    item.textContent =
+      Number(num + sendProductPrice).toLocaleString() + "تومان";
+  });
+}
+collectPriceHand();
+
+let vectorLayer;
+async function mapClickHand(e) {
+  let [x, y] = ol.proj.toLonLat(e.coordinate);
+  let marker = new ol.Feature({
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([x, y])),
+  });
+
+  neshanMap.removeLayer(vectorLayer);
+  marker.setStyle(
+    new ol.style.Style({
+      image: new ol.style.Icon({
+        anchor: [0.5, 1],
+        scale: 0.5,
+        src: "{% static 'assets/images/marker-icon-2x-red.png' %}",
+      }),
+    })
+  );
+
+  let vectorSource = new ol.source.Vector({
+    features: [marker],
+  });
+
+  vectorLayer = new ol.layer.Vector({
+    source: vectorSource,
+  });
+
+  neshanMap.addLayer(vectorLayer);
+  let res = await (
+    await fetch(`https://api.neshan.org/v5/reverse?lat=${y}&lng=${x}`, {
+      headers: {
+        "Api-Key": apiService,
+      },
+    })
+  ).json();
+  $("#address").val(res.formatted_address);
+  $("#offsetsMap").val(JSON.stringify([x, y]));
+}
+let user_addresTimeOut;
+$("#address").on("input", async function () {
+  if (user_addresTimeOut) clearTimeout(user_addresTimeOut);
+
+  user_addresTimeOut = setTimeout(async () => {
+    let res = await (
+      await fetch(`https://api.neshan.org/v4/geocoding?address=${this.value}`, {
+        headers: {
+          "Api-Key": apiService,
+        },
+      })
+    ).json();
+    if (!res.location) return;
+    $("#map").empty();
+    neshanMap = null;
+    neshanMap = new ol.Map({
+      target: "map",
+      key: apiWeb,
+      maptype: "neshan",
+      poi: false,
+      traffic: false,
+      view: new ol.View({
+        center: ol.proj.fromLonLat([res.location.x, res.location.y]),
+        zoom: 14,
+      }),
+    });
+    neshanMap.removeLayer(vectorLayer);
+
+    let marker = new ol.Feature({
+      geometry: new ol.geom.Point(
+        ol.proj.fromLonLat([res.location.x, res.location.y])
+      ),
+    });
+    marker.setStyle(
+      new ol.style.Style({
+        image: new ol.style.Icon({
+          anchor: [0.5, 1],
+          scale: 0.5,
+          src: "{% static 'assets/images/marker-icon-2x-red.png' %}",
+        }),
+      })
+    );
+
+    let vectorSource = new ol.source.Vector({
+      features: [marker],
+    });
+
+    vectorLayer = new ol.layer.Vector({
+      source: vectorSource,
+    });
+
+    neshanMap.addLayer(vectorLayer);
+    $("#offsetsMap").val(JSON.stringify([res.location.x, res.location.y]));
+    neshanMap.on("click", mapClickHand);
+  }, 2000);
+});
+
+    </script>
+    
+{% endblock %}
+
+
+
+
+

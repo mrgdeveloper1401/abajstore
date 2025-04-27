@@ -1,0 +1,9 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block branding %}
+    
+<h1 id="site-name"><a href="http://patterndp.ir"><img src="{% static 'assets/images/logo-pattern.png' %}" alt="Site Logo" style="height: 50px;"/>
+    {{ site_header|default:_('Django administration') }}</a></h1>
+    
+{% endblock %}

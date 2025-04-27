@@ -1,0 +1,795 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+{% block title %} محصولات {% endblock %}
+
+{% block style %} 
+        <link href="{% static 'styles/nouislider.css' %}" rel="stylesheet" />
+    <script src="{% static 'scripts/nouislider.js' %}"></script>
+ {% endblock %}
+
+
+{% block content %} 
+
+
+    
+    
+  
+    <main class="lg:pt-[130px]">
+      <section
+        id="hiddenContent"
+        class="bg-lowOpacityColorBg items-start hidden fixed z-[9] top-0 right-0 w-full h-screen"
+      ></section>
+      <section>
+        <div
+          class="container flex gap-2 text-lowGray text-[12px] text-nowrap overflow-auto"
+        >
+{#          <a href="#">صفحه اصلی</a>#}
+{#          <span class="select-none">/</span>#}
+{#          <p>خواربار</p>#}
+        </div>
+      </section>
+      <section
+        id="hiddenContent"
+        class="bg-lowOpacityColorBg items-start hidden fixed z-[9] top-0 right-0 w-full h-screen"
+      ></section>
+        
+    
+    
+    
+    {% if suggest_categories %}
+      <section>
+        <nav class="container">
+          <ul class="w-full overflow-x-auto overflow-y-hidden flex gap-2 py-5">
+          
+          
+          {% for category in suggest_categories %}
+            <li
+              class="min-w-[150px] max-w-[150px] h-[168px] flex flex-col gap-2 items-center"
+            >
+              <a
+                href="{% url 'products:product_list' %}?category={{ category.name }}"
+                class="min-w-[150px] max-w-[150px] h-[168px] flex flex-col gap-2 items-center">
+              <img
+            src="{% if category.image %}
+                    {{ category.image.url }}
+                    {% else %}
+                    {% static 'assets/images/default-image2.jpg' %}
+                    {% endif %}"
+                class="aspect-video object-contain w-full h-full basis-[90%]"
+                height="auto"
+                alt="{{ category.name }}"
+              />
+              <span class="text-sm basis-[10%] h-full w-full block text-center"
+                >{{ category.name }}</span
+              >
+            </a>
+            </li>
+            {% endfor %}
+          
+          </ul>
+        </nav>
+      </section>
+    {% endif %}
+    
+    
+        
+        
+      <section>
+        <div
+          class="container flex lg:flex-row justify-between items-start flex-col p-2 gap-5"
+        >
+          <aside
+            class="min-w-[300px] lg:block hidden sticky top-[120px] boxBorder rounded-md py-5 px-4"
+          >
+            <nav>
+              <form>
+                  {% csrf_token %}
+                <ul class="space-y-8">
+                  <li><h2 class="text-xl text-lowGray">فیلترها</h2></li>
+                  <li class="border-b-2 border-submitPageColorBorderLowBlack">
+                    <button
+                      type="button"
+                      class="dropDownBtn flex justify-between w-full items-center py-2"
+                    >
+                      <span>جستجو در نتایج</span>
+                      <i class="fa fa-angle-down"></i>
+                    </button>
+                    <div class="space-y-2">
+                      <div
+                        class="boxBorder gap-2 boxBorder flex items-center px-2"
+                      >
+                        <button type="submit" class="basis-[5%] p-2">
+                          <i class="fa fa-search"></i>
+                        </button>
+                          <label for="searchProduct"></label><input
+                          class="basis-[95%] text-sm outline-none"
+                          type="text"
+                          name="name"
+                          value="{{ request.GET.name  }}"
+                          placeholder="کد یا نام محصول مورد نظر را بنویسید"
+                          id="searchProduct"
+                        />
+                      </div>
+                      <a href="#" class="hidden">[searched result]</a>
+                    </div>
+                    <p class="hidden text-lowGray">[searched result]</p>
+                  </li>
+                  <li class="border-b-2 border-submitPageColorBorderLowBlack">
+                    <button
+                      type="button"
+                      class="dropDownBtn flex justify-between w-full items-center py-2"
+                    >
+                      <span>فیلتر قیمت</span>
+                      <i class="fa fa-angle-down"></i>
+                    </button>
+                    <div class="space-y-2 flex flex-col gap-2 items-center">
+                      <div
+                        id="rangeSlider"
+                        class="opacity-80 w-[80%]"
+                        style="filter: grayscale(100%)"
+                      ></div>
+                      <div class="flex gap-2 w-full">
+                        <div
+                          class="flex boxBorder w-full items-center text-sm flex-col gap-2 text-lowGray px-4"
+                        >
+                          <span>تا</span>
+                            <label>
+                                <input class="hidden" type="number" name="price_max" value="{{ request.GET.price_max }}" />
+                            </label>
+                            <span
+                            id="toPrice"
+                            class="bg-lowerGray block w-full max-w-[172px] text-center text-blackColor"
+                            >0</span
+                          >
+                          <span>تومان</span>
+                        </div>
+                        <div
+                          class="flex boxBorder w-full items-center text-sm flex-col gap-2 text-lowGray px-4"
+                        >
+                          <span>از</span>
+                            <label>
+                                <input class="hidden" type="number" name="price_min" value="{{ request.GET.price_min }}" />
+                            </label>
+                            <span
+                            id="fromPrice"
+                            class="bg-lowerGray block w-full max-w-[172px] text-center text-blackColor"
+                            >0</span
+                          >
+                          <span>تومان</span>
+                        </div>
+                      </div>
+                      <button
+                        type="submit"
+                        class="bg-redColor opacity-75 hover:opacity-100 transition-all text-whiteColor w-[80%] py-2 rounded-md"
+                      >
+                        اعمال فیلتر
+                      </button>
+                      <a href="#" class="hidden">[searched result]</a>
+                    </div>
+                    <p class="hidden text-lowGray">[searched result]</p>
+                  </li>
+                  <li class="space-y-4">
+                      
+{#                    <div>#}
+{#                        <form method="get">#}
+{#                            {{ filter.form.order_by }}#}
+{#                            <button type="submit">مرتب‌سازی</button>#}
+{#                        </form>#}
+{#                        <div class="customeCheckbox"></div>#}
+{#                    </div>#}
+                      
+                      
+                      
+                      
+{#                    <div>#}
+{#                      <label class="flex gap-2" for="minProductsOnly">#}
+{#                        <input#}
+{#                          type="checkbox"#}
+{#                          class="hidden inputCheckbox"#}
+{#                          id="minProductsOnly"#}
+{#                          name="checkBoxName"#}
+{#                          id=""#}
+{#                        />#}
+{#                        <div class="customeCheckbox"></div>#}
+{#                        فقط محصولات دارای موجودی#}
+{#                      </label>#}
+{#                    </div>#}
+{#                    <div>#}
+{#                      <label class="flex gap-2" for="imageProductsOnly">#}
+{#                        <input#}
+{#                          type="checkbox"#}
+{#                          class="hidden inputCheckbox"#}
+{#                          id="imageProductsOnly"#}
+{#                          name="checkBoxName"#}
+{#                          id=""#}
+{#                        />#}
+{#                        <div class="customeCheckbox"></div>#}
+{#                        فقط محصولات دارای تصویر#}
+{#                      </label>#}
+{#                    </div>#}
+                  </li>
+                </ul>
+              </form>
+            </nav>
+          </aside>
+            
+            
+            
+            
+          <div
+            class="md:pt-[20px] w-full text-lowGray divide-y-2 divide-submitPageColorBorderLowBlack"
+          >
+            <div class="flex justify-between w-full">
+{#              <h2>خواربار</h2>#}
+{#              <p class="text-[12px]">#}
+{#                نمایش <span>{{ products.start_index }}</span> تا <span>{{ products.end_index }}</span> از#}
+{#                <span>{{ products.paginator.count }}</span> محصول#}
+{#              </p>#}
+            </div>
+            <ul class="lg:flex hidden gap-6 text-[12px] py-5">
+              <li class="flex gap-2">
+                <i class="fa fa-sort-amount-down text-[20px]"></i>
+                <p>مرتب سازی بر اساس :</p>
+              </li>
+              <li>
+                <a {% if request.GET.order_by == '-created' %}class="text-primary"{% endif %}
+                   href="{% url 'products:product_list' %}?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}order_by=-created">جدیدترین</a>
+              </li>
+              <li>
+                <a {% if request.GET.order_by == '-discount' %}class="text-primary"{% endif %}
+                        href="{% url 'products:product_list' %}?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}order_by=-discount">
+                    بیشترین تخفیف</a>
+              </li>
+              <li>
+                <a {% if request.GET.order_by == 'price' %}class="text-primary"{% endif %}
+                        href="{% url 'products:product_list' %}?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}order_by=price">
+                    ارزان‌ترین</a>
+              </li>
+              <li>
+                <a {% if request.GET.order_by == '-price' %}class="text-primary"{% endif %}
+                        href="{% url 'products:product_list' %}?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}order_by=-price">
+                    گران‌ترین</a>
+              </li>
+            </ul>
+
+
+
+
+            <ul class="lg:hidden flex gap-4 py-5 text-blackColor text-sm">
+              <li>
+                <button id="showFilterSect">
+                  <i class="fa fa-sliders-h"></i>
+                  <span>فیلتر</span>
+                </button>
+              </li>
+              <li>
+                <button id="showSortSectionBtn">
+                  <i class="fa fa-sort-amount-down"></i>
+                  <span>
+                    {% if request.GET.order_by == '-created' %}
+                        جدیدترین
+                    {% elif request.GET.order_by == '-discount' %}
+                        بیشترین تخفیف
+                    {% elif request.GET.order_by == 'price' %}
+                        ارزان ترین
+                    {% elif request.GET.order_by == '-price' %}
+                        گرانترین
+                        {% else %}
+                        جدیدترین
+                    {% endif %}
+                  </span>
+                </button>
+              </li>
+            </ul>
+
+
+
+            <div
+              class="grid divide-x-2 divide-y-2 border-2 border-submitPageColorBorderLowBlack sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            >
+                
+                {% for product in products %}
+
+
+              <div
+                class="flex relative p-4 sm:flex-col gap-4 items-end justify-between border-2 border-submitPageColorBorderLowBlack transition-all hover:shadow-md shadow-submitPageColorBorderLowBlack"
+              >
+                <a href="{% url 'products:product_detail' product.id %}" class="w-full flex items-center sm:flex-col gap-2">
+                  <img
+                    loading="lazy"
+                    class="sm:max-w-[300px] w-full max-w-[114px] sm:h-[200px] aspect-auto object-contain"
+                    src="{% if product.cover_image %}
+                            {{ product.cover_image.url }}
+                            {% else %}
+                            {% static 'assets/images/default-image2.jpg' %}
+                            {% endif %}"
+                    alt="{{ product.name }}"
+                  />
+                  <h3
+                    class="w-full pb-10 text-[12px] sm:text-[14px] md:text-[12px] xl:text-[15px] max-h-[60px] overflow-hidden mb-[40px] sm:overflow-y-hidden overflow-y-auto"
+                  >
+                    {{ product.name }}
+                  </h3>
+                </a>
+                  
+                  
+                  
+                  
+                <div
+                  class="flex absolute sm:static left-[10px] bottom-[10px] gap-2 sm:items-center items-end sm:w-full justify-between"
+                >
+                  <div class="sm:hidden inline-block">
+                  
+                  
+                    {% if product.discount %}
+                    <div class="text-[12px] flex gap-2">
+                      <del class="text-mdGray">
+                        {{ product.price }}
+                        <span> تومان </span>
+                      </del>
+                      <span
+                        class="px-2 text-sm text-whiteColor bg-primary rounded-2xl"
+                        >{{ product.discount }}%</span
+                      >
+                    </div>
+                    <span class="setFormatNumber"> {{ product.discounted_price }} </span>
+                        تومان
+                      {% else %}
+                            
+                    <span class="setFormatNumber"> {{ product.discounted_price }} </span>
+                        تومان
+                            
+                      {% endif %}
+                  </div>  
+                
+                  <form method="post" action="{% url 'carts:add' %}">
+                      {% csrf_token %}
+                  <input type="hidden" name="product" value="{{ product.id }}">
+                <input type="hidden" name="quantity" value="
+                    {% if product.unit_type == 1 %}
+                    1.0
+                    {% else %}
+                    0.1
+                    {% endif %}
+                    ">
+                    <button type="submit"
+                      class="p-3 flex justify-center items-center bg-primary text-whiteColor rounded-md"
+                    >
+                      <i class="fa fa-plus"></i>
+                    </button>
+                  </form>
+                    
+                
+                  <div class="sm:inline-block hidden">
+                  
+                    {% if product.discount %}
+                    <div class="text-[12px] flex gap-2">
+                      <del class="text-mdGray">
+                        {{ product.price }}
+                        <span> تومان </span>
+                      </del>
+                      <span
+                        class="px-2 text-sm text-whiteColor bg-primary rounded-2xl"
+                        >{{ product.discount }}%</span
+                      >
+                    </div>
+                    <span class="setFormatNumber"> {{ product.discounted_price }} </span>
+                        تومان
+                        
+                  {% else %}
+                    <span class="setFormatNumber"> {{ product.discounted_price }} </span>
+                        تومان
+
+                  {% endif %}
+                  </div>
+                    
+                    
+                    
+                </div>
+              </div>
+			  
+			  
+                {% endfor %}
+                
+                
+                
+                
+            </div>
+          </div>
+        </div>
+      </section>
+        
+        
+        
+        
+        
+        
+      <section
+        class="lg:hidden filterContWithAnimate hidden bg-lowOpacityColorBg fixed w-full h-screen top-0 left-0 z-[100]"
+        id="filterCont"
+      >
+        <form
+          class="bg-whiteColor space-y-4 flex flex-col w-full h-screen absolute px-5 py-4"
+        >
+                  {% csrf_token %}
+
+          <div class="justify-between flex">
+            <span>فیلترها</span>
+            <button class="p-2" id="closeFilterWindow" type="button">
+              <i class="fa fa-remove"></i>
+            </button>
+          </div>
+          <div class="border-b-2 border-submitPageColorBorderLowBlack">
+            <button
+              type="button"
+              class="dropDownBtn flex justify-between w-full items-center py-2"
+            >
+              <span>جستجو در نتایج</span>
+              <i class="fa fa-angle-down"></i>
+            </button>
+            <div class="space-y-2">
+              <div class="boxBorder gap-2 boxBorder flex items-center px-2">
+                <button type="submit" class="basis-[5%] p-2">
+                  <i class="fa fa-search"></i>
+                </button>
+                  <label for="searchProduct2"></label><input
+                  class="basis-[95%] text-sm outline-none"
+                  type="text"
+                  name="name"
+                  value="{{ request.GET.name  }}"
+                  placeholder="کد یا نام محصول مورد نظر را بنویسید"
+                  id="searchProduct2"
+                />
+              </div>
+              <a href="#" class="hidden">[searched result]</a>
+            </div>
+          </div>
+          <div class="border-b-2 border-submitPageColorBorderLowBlack">
+            <button
+              type="button"
+              class="dropDownBtn flex justify-between w-full items-center py-2"
+            >
+              <span>فیلتر</span>
+              <i class="fa fa-angle-down"></i>
+            </button>
+            <div class="space-y-2 flex flex-col gap-2 items-center p-0">
+              <div
+                id="rangeSlider2"
+                class="opacity-80 w-[80%]"
+                style="filter: grayscale(100%)"
+              ></div>
+              <div class="flex gap-2 w-full">
+                <div
+                  class="flex boxBorder w-full items-center text-sm flex-col gap-2 text-lowGray px-4"
+                >
+                  <span>تا</span>
+                    <label>
+                        <input class="hidden" type="number" name="price_max" value="{{ request.GET.price_max }}" />
+                    </label>
+                    <span
+                    id="toPrice2"
+                    class="bg-lowerGray block w-full max-w-[172px] text-center text-blackColor"
+                    >0</span
+                  >
+                  <span>تومان</span>
+                </div>
+                <div
+                  class="flex boxBorder w-full items-center text-sm flex-col gap-2 text-lowGray px-4"
+                >
+                  <span>از</span>
+                    <label>
+                        <input class="hidden" type="number" name="price_min" value="{{ request.GET.price_min }}" />
+                    </label>
+                    <span
+                    id="fromPrice2"
+                    class="bg-lowerGray block w-full max-w-[172px] text-center text-blackColor"
+                    >0</span
+                  >
+                  <span>تومان</span>
+                </div>
+              </div>
+              <button
+                class="bg-redColor opacity-75 hover:opacity-100 transition-all text-whiteColor w-[80%] py-2 rounded-md"
+              >
+                اعمال فیلتر
+              </button>
+              <a href="#" class="hidden">[searched result]</a>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="flex gap-2" for="minProductsOnly2">
+                <input
+                  type="checkbox"
+                  class="hidden inputCheckbox"
+                  id="minProductsOnly2"
+                  name="checkBoxName"
+                />
+                <div class="customeCheckbox"></div>
+                فقط محصولات دارای موجودی
+              </label>
+            </div>
+            <div>
+              <label class="flex gap-2" for="imageProductsOnly2">
+                <input
+                  type="checkbox"
+                  class="hidden inputCheckbox"
+                  id="imageProductsOnly2"
+                  name="checkBoxName"
+                />
+                <div class="customeCheckbox"></div>
+                فقط محصولات دارای تصویر
+              </label>
+            </div>
+          </div>
+        </form>
+      </section>
+      <section
+        class="lg:hidden hidden filterContWithAnimate bg-lowOpacityColorBg fixed w-full h-screen top-0 left-0 z-[100]"
+        id="sortsFilterSec"
+      >
+        <div
+          class="h-[370px] bg-whiteColor rounded-t-lg bottom-0 w-full p-5 fixed"
+        >
+          <div class="flex justify-between">
+            <h4 class="sm:text-xl text-lg">مرتب سازی بر اساس</h4>
+            <button id="closeSortsFilterSecBtn" class="p-2">
+              <i class="fa fa-times fa-size-px"></i>
+            </button>
+          </div>
+          <ul
+            class="gap-2 flex max-h-full divide-y-2 divide-submitPageColorBorderLowBlack flex-col h-[300px] overflow-auto"
+          >
+            <li>
+                <a href="{% url 'products:product_list' %}?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}order_by=-created" class="w-full py-2 block
+                {% if request.GET.order_by == '-created' %}text-primary font-bold{% endif %}
+                ">جدیدترین</a>
+            </li>
+            <li>
+                <a href="{% url 'products:product_list' %}?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}order_by=-discount" 
+                   class="w-full py-2 block
+                {% if request.GET.order_by == '-discount' %}text-primary font-bold{% endif %}
+                ">بیشترین تخفیف</a>
+            </li>
+            <li>
+                <a href="{% url 'products:product_list' %}?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}order_by=price" class="w-full py-2 block
+                {% if request.GET.order_by == 'price' %}text-primary font-bold{% endif %}
+                ">ارزان‌ترین</a>
+            </li>
+            <li>
+                <a href="{% url 'products:product_list' %}?{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}order_by=-price" class="w-full py-2 block
+                {% if request.GET.order_by == '-price' %}text-primary font-bold{% endif %}
+                ">گران‌ترین</a>
+            </li>
+          </ul>
+        </div>
+      </section>
+        
+        
+    
+
+    
+{% if is_paginated %}
+
+        
+      <section>
+        <div class="container">
+          <ul class="flex justify-center gap-2">
+          
+{#               first page#}
+{#                {% if page_obj.number == 1 %}#}
+                    <li {% if page_obj.number == 1 %} class="paginationLiActive" {% endif %}>
+                      <a
+                        href="?{% if request.GET %}{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page=1"
+                        class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                        >1</a>
+                    </li>
+{#                {% endif %}#}
+          
+              
+{#               previous page #}
+                {% if page_obj.has_previous and page_obj.number != 2 %}
+                    {% if page_obj.number > 3 %}
+                        <li>
+                          <a
+                            href="#"
+                            class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                            >...</a>
+                        </li>
+                    {% endif %}
+                    
+                    <li>
+                      <a
+                        href="?{% if request.GET %}{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page={{ page_obj.previous_page_number }}"
+                        class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                        >{{ page_obj.previous_page_number }}</a>
+                    </li>
+                {% endif %}
+
+          
+{#              current page #}
+          {% if page_obj.number != 1 %}
+                <li class="paginationLiActive">
+                  <a
+                    href="#"
+                    class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                    >{{ page_obj.number }}</a>
+                </li>
+          {% endif %}
+
+{#               next page #}
+                {% if page_obj.has_next %}
+                    <li>
+                      <a
+                        href="?{% if request.GET %}{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page={{ page_obj.next_page_number }}"
+                        class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                        >{{ page_obj.next_page_number }}</a>
+                    </li>
+                    
+                    {% if page_obj.next_page_number > page_obj.number and page_obj.next_page_number != page_obj.paginator.num_pages %}
+                    <li>
+                      <a
+                        href="#"
+                        class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                        >...</a>
+                    </li>
+                    {% endif %}
+                {% endif %}
+          
+          
+          
+{#              last page #}
+                {% if page_obj.number != page_obj.next_page_number and page_obj.next_page_number != page_obj.paginator.num_pages  %}
+
+                    
+                    <li>
+                      <a
+                        href="?{% if request.GET %}{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}{% endif %}page={{ page_obj.paginator.num_pages }}"
+                        class="min-w-[40px] hover:bg-submitPageColorBorderLowBlack py-2 rounded-md min-h-38 flex justify-center items-center boxBorder"
+                        >{{ page_obj.paginator.num_pages }}</a>
+                    </li>
+                {% endif %}
+              
+          
+          </ul>
+        </div>
+      </section>
+    {% endif %}
+    
+    
+    
+    
+    </main>
+    
+    
+  
+    
+{% endblock %}
+
+
+{% block scripts %}
+
+    <script>
+      let addUs_birthday = document.querySelector("#user_birthday");
+      jalaliDatepicker.startWatch({
+        dayRendering: function (dayOptions, addUs_birthday) {
+          return {
+            isHollyDay: dayOptions.month == 1 && dayOptions.day <= 4,
+          };
+        },
+      });
+      // set her max products price
+      let maxPrice = 1499000;
+      let rangeSlider = noUiSlider.create($("#rangeSlider")[0], {
+        start: [0, maxPrice],
+        connect: true,
+        color: "red",
+        rangColor: "red",
+        range: {
+          min: 0,
+          max: maxPrice,
+        },
+      });
+      let rangeSlider2 = noUiSlider.create($("#rangeSlider2")[0], {
+        start: [0, maxPrice],
+        connect: true,
+        color: "red",
+        rangColor: "red",
+        range: {
+          min: 0,
+          max: maxPrice,
+        },
+      });
+      let closeFilterWindowInterVal = null;
+      rangeSlider.on("update", () => {
+        $("#fromPrice").text(Math.round(rangeSlider.get()[0]).toLocaleString());
+        $("#toPrice").text(Math.round(rangeSlider.get()[1]).toLocaleString());
+        console.log($("#fromPrice")[0].previousElementSibling);
+        $("#fromPrice")[0].previousElementSibling.value = Math.round(
+          rangeSlider.get()[0]
+        );
+        $("#toPrice")[0].previousElementSibling.value = Math.round(
+          rangeSlider.get()[1]
+        );
+      });
+      rangeSlider2.on("update", () => {
+        $("#fromPrice2")[0].previousElementSibling.value = Math.round(
+          rangeSlider2.get()[0]
+        );
+        $("#fromPrice2").text(
+          Math.round(rangeSlider2.get()[0]).toLocaleString()
+        );
+        $("#toPrice2")[0].previousElementSibling.value = Math.round(
+          rangeSlider2.get()[0]
+        );
+        $("#toPrice2").text(Math.round(rangeSlider2.get()[1]).toLocaleString());
+      });
+
+      function closeSectionFilters(interVal, filterCont, classes) {
+        if (interVal) clearInterval(interVal);
+        filterCont.removeClass(classes[0]);
+        filterCont.addClass(classes[1]);
+        interVal = setTimeout(() => {
+          interVal = null;
+          filterCont.removeClass(classes[1]);
+          filterCont.addClass(classes[2]);
+          document.body.classList.remove("overflow-hidden");
+        }, 500);
+      }
+
+      $(".dropDownBtn").on("click", function () {
+        $(this).toggleClass("showFilter");
+      });
+      $(".inputCheckbox").on("change", function () {
+        if (this.checked) {
+          this.nextElementSibling.classList.add("active");
+        } else {
+          this.nextElementSibling.classList.remove("active");
+        }
+      });
+      $("#showFilterSect").on("click", function () {
+        $("#filterCont").addClass("showFilterSec");
+        $("#filterCont").removeClass("hidden");
+        document.body.classList.add("overflow-hidden");
+      });
+
+      $("#showSortSectionBtn").on("click", function () {
+        $("#sortsFilterSec").addClass("showFilterSec");
+        $("#sortsFilterSec").removeClass("hidden");
+        document.body.classList.add("overflow-hidden");
+      });
+
+      $("#closeFilterWindow").on("click", function () {
+        closeSectionFilters(closeFilterWindowInterVal, $("#filterCont"), [
+          "showFilterSec",
+          "hideFilterSec",
+          "hidden",
+        ]);
+      });
+      $("#filterCont").on("click", function (e) {
+        if (e.target == this) $("#closeFilterWindow").click();
+      });
+      $("#closeSortsFilterSecBtn").on("click", function () {
+        closeSectionFilters(closeFilterWindowInterVal, $("#sortsFilterSec"), [
+          "showFilterSec",
+          "hideFilterSec",
+          "hidden",
+        ]);
+      });
+      $("#sortsFilterSec").on("click", function (e) {
+        if (e.target == this) $("#closeSortsFilterSecBtn").click();
+      });
+      $("#sortsFilterSec").on("click", function (e) {
+        if (e.target == this) $("#closeSortsFilterSecBtn").click();
+      });
+      $(
+        "#filterCont form input:not([type=text]),aside form input:not([type=text])"
+      ).on("change", function () {
+        $("#filterCont form ").submit();
+      });
+    </script>
+    
+ {% endblock %}

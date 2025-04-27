@@ -1,0 +1,54 @@
+{#{% if messages %}#}
+{##}
+{#    {% for msg in messages %}#}
+{#          <div class="sm:text-lg text-sm divTextAlert {{ msg.tags }}">#}
+{#            <p>{{ msg }}</p>#}
+{#          </div>#}
+{#    {% endfor %}#}
+{##}
+{#{% endif %}#}
+
+{% load static %}
+{% if messages %}
+
+    {% for msg in messages %}
+    <script>
+      // Sweet alert codes
+
+      // Alert icon
+      //   question
+      //   error
+      //   success
+      //   info
+      
+      let icon = "{{ msg.tags }}";
+      // Alert title
+      let title = "{{ msg }}";
+
+      // button text
+      let confirmButtonText = "باشه";
+
+      // other text
+      let text = "";
+
+      // icon color
+      // -------you should replace red to "" for see realy color
+      let iconColor = "";
+
+      // function popUp
+      function popUp(title, icon, text, confirmButtonText, iconColor) {
+        Swal.fire({
+          title: title,
+          icon: icon,
+          text: text,
+          iconColor: iconColor,
+          confirmButtonText: confirmButtonText,
+        });
+      }
+
+      // call popUp and set varibles
+      popUp(title, icon, text, confirmButtonText, iconColor);
+    </script>
+    {% endfor %}
+
+{% endif %}

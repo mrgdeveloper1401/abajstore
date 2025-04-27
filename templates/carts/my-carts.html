@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %} سبد خرید {% endblock %}
+
+{% block style %} 
+    <link rel="stylesheet" href="{% static 'styles/jalalidatepicker.min.css' %}" />
+    <link href="{% static 'styles/nouislider.css' %}" rel="stylesheet" />
+    <script src="{% static 'scripts/nouislider.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    
+    <main class="lg:pt-[130px]">
+    
+    
+    
+        {% if not carts %}
+      <section class="my-4">
+        <div
+          class="container py-10 flex select-none items-center justify-center flex-col md:boxBorder rounded-md gap-5"
+        >
+          <div class="flex flex-col items-center">
+            <img
+              class="w-full"
+              src="{% static 'assets/images/empty-cart.svg' %}"
+              alt="xxx"
+            />
+            <h1 class="md:text-2xl text-lg">سبد خرید شما خالی است!</h1>
+          </div>
+          <a
+            href="{% url 'products:product_list' %}"
+            class="bg-redColor mt-16 border-none opacity-80 hover:opacity-100 transition-opacity duration-300 text-whiteColor px-5 py-2 rounded-md"
+            >بازگشت به فروشگاه</a
+          >
+        </div>
+      </section>
+        {% else %}
+            
+            
+            
+            
+      <section
+        id="hiddenContent"
+        class="bg-lowOpacityColorBg items-start hidden fixed z-[9] top-0 right-0 w-full h-screen"
+      ></section>
+      <section>
+        <div
+          class="container flex gap-2 text-lowGray text-[12px] text-nowrap overflow-auto"
+        >
+          <a href="{% url 'products:home' %}">صفحه اصلی</a>
+          <span class="select-none">/</span>
+          <p>سبد خرید</p>
+        </div>
+      </section>
+      <section>
+        <div class="container text-lowGray px-4 boxBorder rounded-lg mb-5">
+        
+        
+            
+            
+            
+          <div class="boxBorder rounded-lg">
+            <table class="lg:table hidden w-full">
+              <thead>
+                <tr>
+                  <th class="text-start px-4 py-4">#</th>
+                  <th class="text-start px-4 py-4">
+                    <img
+                      src="{% static 'assets/images/imageicon.png' %}"
+                      class="max-w-[40px]"
+                      alt="xxx"
+                    />
+                  </th>
+                  <th class="text-start px-4 py-4">نام محصول</th>
+                  <th class="text-start px-4 py-4">تعداد</th>
+                  <th class="text-start px-4 py-4">قیمت</th>
+                  <th class="text-start px-4 py-4">جمع</th>
+                  <th class="text-start px-4 py-4"></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+              
+              
+              {% for cart_item in carts %}
+                <tr class="odd:bg-lowerGray">
+                  <td class="text-sm px-4">{{ forloop.counter }}</td>
+                  <td class="text-sm px-4">
+                    <a href="{% url 'products:product_detail' cart_item.product.id %}">
+                        
+                      <img
+                        src="{% if cart_item.product.cover_image %}
+                            {{ cart_item.product.cover_image.url }}
+                            {% else %}
+                            {% static 'assets/images/default-image2.jpg' %}
+                            {% endif %}"
+                        alt="xxx"
+                        class="max-w-[80px] max-y-[100px] aspect-[16/9] object-contain"
+                      />
+                        
+                    </a>
+                  </td>
+                  <td class="text-sm px-4">{{ cart_item.product.name }}</td>
+                  <td class="text-sm px-4">
+                      
+                      
+                  <form method="post" action="{% url 'carts:update_cartitem' %}">
+                          {% csrf_token %}
+                              <input type="hidden" name="cartitem_id" value="{{ cart_item.id }}">
+                    <div
+                      class="flex pcsProduct bg-whiteColor justify-between p-2 max-w-[200px] w-full rounded-lg gap-2 boxBorder"
+                    >
+                      <button type="submit" name="action" value="increase">
+                        <i class="text-lg fa fa-plus"></i>
+                      </button>
+                        <label>
+                            <input
+                              disabled
+                              type="text"
+                              class="bg-[transparent] text-center w-full outline-none"
+                              name="asd"
+                              value="{{ cart_item.rounded_quantity }}"
+                            />
+                        </label>
+                        <button type="submit" name="action" value="decrease">
+                        <i class="text-lg fa fa-minus"></i>
+                      </button>
+                    </div>
+                    {% if cart_item.product.unit_type == 1 %}    
+                        عدد
+                    {% else %}
+                        کیلو
+                    {% endif %}
+                  </form>
+                          
+                      
+                  </td>
+                  <td class="text-sm px-4">
+                    {{ cart_item.product.discounted_price }}
+                    <span>تومان</span>
+                  </td>
+                  <td class="text-sm px-4">
+                    {{ cart_item.cart_item_discounted_price }}
+                    <span>تومان</span>
+                  </td>
+                  <td class="text-sm">
+                    <a href="{% url 'carts:remove' cart_item.id %}" class="hover:text-primary"
+                      ><i class="fa fa-trash fa-lg"></i
+                    ></a>
+                  </td>
+                </tr>
+              {% endfor %}
+              
+              
+              </tbody>
+            </table>
+          
+          
+          
+          
+            <ul class="lg:hidden flex gap-2 flex-col">
+                
+                {% for cart_item in carts %}
+              <li class="p-2 odd:bg-lowerGray flex gap-2 flex-col">
+                <div class="flex justify-between items-center py-2">
+                  <span>ردیف</span>
+                  <span>{{ forloop.counter }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                  <span>نام محصول</span>
+                  <span>{{ cart_item.product.name }}</span>
+                </div>
+                  
+                <div class="flex justify-between items-center py-2">
+                  <span>تعداد</span>
+                  <div>
+                      <form method="post" action="{% url 'carts:update_cartitem' %}">
+                      {% csrf_token %}
+                              <input type="hidden" name="cartitem_id" value="{{ cart_item.id }}">
+                      
+                    <div
+                      class="pcsProduct bg-whiteColor flex justify-between p-2 max-w-[150px] w-full rounded-lg gap-2 boxBorder"
+                    >
+                      <button type="submit" name="action" value="increase">
+                        <i class="text-lg fa fa-plus"></i>
+                      </button>
+                        <label>
+                            <input
+                              disabled
+                              type="text"
+                              class="bg-[transparent] text-center w-full outline-none"
+                              name="asd"
+                              value={{ cart_item.rounded_quantity }}
+                            />
+                        </label>
+                        <button type="submit" name="action" value="decrease">
+                        <i class="text-lg fa fa-minus"></i>
+                      </button>
+                    </div>
+                    <span class="text-sm text-end w-full block">
+                    {% if cart_item.product.unit_type == 1 %}    
+                        عدد
+                    {% else %}
+                        کیلو
+                    {% endif %}
+                    </span>
+                          </form>
+                  </div>
+                </div>
+                  
+                  
+                  
+                <div class="flex justify-between items-center py-2">
+                  <span>قیمت</span>
+                  <span class="text-sm">
+                    {{ cart_item.product.discounted_price }}
+                    <span>تومان</span>
+                  </span>
+                </div>
+
+                <div class="flex justify-between items-center py-2">
+                  <span>جمع</span>
+                  <span class="text-sm">
+                    {{ cart_item.cart_item_discounted_price }}
+                    <span>تومان</span>
+                  </span>
+                </div>
+
+                <div class="flex justify-between items-center py-2">
+                  <span></span>
+                  <span
+                    ><a href="{% url 'carts:remove' cart_item.id %}" class="hover:text-primary"
+                      ><i class="fa fa-trash fa-lg"></i></a
+                  ></span>
+                </div>
+              </li>
+                {% endfor %}
+                
+            </ul>
+          </div>
+        
+        
+        
+        
+          <div class="flex justify-end py-2">
+            <div class="md:w-1/2 w-full flex flex-col gap-4">
+              <h1 class="flex flex-col gap-1">
+                جمع کل سبد خرید
+                <span
+                  class="w-full max-w-[60px] border-[1.5px] border-primary"
+                ></span>
+              </h1>
+              <div class="flex gap-2 flex-col">
+{#                <div#}
+{#                  class="flex justify-between border-b p-2 border-submitPageColorBorderLowBlack"#}
+{#                >#}
+{#                  <span>جمع:</span>#}
+{#                  <p>#}
+{#                    <span></span>#}
+{#                    <span>تومان</span>#}
+{#                  </p>#}
+{#                </div>#}
+                <div class="flex justify-between p-2">
+                  <span>مبلغ قابل پرداخت:</span>
+                  <p>
+                    <span>{{ cart.calculate_total_discounted_price }}</span>
+                    <span>تومان</span>
+                  </p>
+                </div>
+                <div class="flex justify-between p-2">
+                  <span>تعداد کل کالا ها:</span>
+                  <p>
+                      
+                    <span>{{ cart.total_quantity }}</span>
+                    <span>عدد</span>
+                      
+                  </p>
+                </div>
+                <div class="flex justify-end">
+                  <a
+                    href="{% url 'orders:checkout' %}"
+                    class="py-2 px-3 w-max bg-redColor opacity-75 hover:opacity-100 transition-all text-[16px] text-whiteColor rounded-lg"
+                    >ادامه فرآیند خرید</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+        {% endif %}
+    </main>
+  
+  
+    
+    
+    
+    
+ {% endblock %}
+
+
+
+
+
+
+{% block scripts %} 
+      <script
+      type="text/javascript"
+      src="{% static 'scripts/jalalidatepicker.min.js' %}"
+    ></script>
+    <script src="{% static 'scripts/jquery.js' %}"></script>
+    <script src="{% static 'scripts/main.js' %}"></script>
+{#    <script>#}
+{#      let methodNumber = 0.1;#}
+{#      let minLength = methodNumber;#}
+{#      let maxFloat = 1;#}
+{#      Array.from($(".pcsProduct button")).forEach((btn) => {#}
+{#        btn.addEventListener("click", () => {#}
+{#          if (btn.children[0].classList.contains("fa-plus")) {#}
+{#            let value =#}
+{#              Number(btn.nextElementSibling.value) + Number(methodNumber);#}
+{#            if (String(value).includes(".")) value = value.toFixed(maxFloat);#}
+{#            btn.nextElementSibling.value = value;#}
+{#          } else if (btn.previousElementSibling.value > minLength) {#}
+{#            let value =#}
+{#              Number(btn.previousElementSibling.value) - Number(methodNumber);#}
+{#            if (String(value).includes(".")) value = value.toFixed(maxFloat);#}
+{#            console.log(btn.previousElementSibling);#}
+{#            btn.previousElementSibling.value = value;#}
+{#          }#}
+{#        });#}
+{#      });#}
+{##}
+{#      $("#pcsProduct button").on("click", function () {});#}
+{#    </script>#}
+{% endblock %}
+
+
+
+
+

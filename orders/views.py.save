@@ -1,0 +1,536 @@
+from django.contrib import messages
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import ListView, DetailView, CreateView, TemplateView, RedirectView, FormView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404, redirect
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser
+from rest_framework.authentication import TokenAuthentication
+from .models import Invoice
+from .serializers import InvoiceSerializer
+from django.urls import reverse_lazy, reverse
+from django.core.mail import send_mail
+from django.conf import settings
+from .models import Order, OrderItem, Payment
+from .forms import OrderForm
+from accounts.forms import AddressForm
+from carts.models import Cart
+from site_settings.models import SiteSettings
+from configs.sms_panel import send_sms
+from configs.dargah_parsian import PaymentGateway
+from configs.dargah_mellat import Mellat
+from configs.sepandyar_webAPI import send_invoice_list
+from utils.send_invoice_via_email import send_invoice_email
+import datetime
+import random
+import time
+import json
+import jdatetime
+import pytz
+import logging
+from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from .models import Invoice
+from .serializers import InvoiceSerializer
+logger = logging.getLogger(__name__)
+# logging.basicConfig(filename='order_view.log',
+#                     level=logging.WARNING,
+#                     format='%(asctime)s - %(levelname)s - %(message)s')
+
+weekdays_farsi = {
+    'Saturday': 'شنبه',
+    'Sunday': 'یک‌شنبه',
+    'Monday': 'دوشنبه',
+    'Tuesday': 'سه‌شنبه',
+    'Wednesday': 'چهارشنبه',
+    'Thursday': 'پنج‌شنبه',
+    'Friday': 'جمعه'
+}
+TIME_SLOTS = [
+    (1, '08:00 - 10:00'),
+    (2, '10:00 - 12:00'),
+    (3, '12:00 - 14:00'),
+    (4, '14:00 - 16:00'),
+    (5, '16:00 - 18:00'),
+    (6, '18:00 - 20:00'),
+    (7, '20:00 - 22:00'),
+    (8, '22:00 - 24:00'),
+]
+
+
+# =====================================================================================================
+# ======================================== UseFull Functions ==========================================
+def generate_random_code():
+    timestamp = int(time.time() * 1000)
+    random_number = random.randint(10 ** 4, 10 ** 7)
+    return str(timestamp + random_number)[4:]
+
+
+
+def create_invoice(order):
+    invoice_list = []
+    
+    # افزودن آیتم‌های سفارش
+    for item in order.order_items.all():
+        invoice_item = {
+            "InvoiceNum": int(order.code),
+            "InvoiceDate": order.created_to_jalali().strftime('%Y/%m/%d'),
+            "AnbarId": 1,
+            "RelationId": int(item.product_code),
+            "RelationType": 0,
+            "Quantity": float(item.quantity),
+            "Bed": 0,
+            "Bes": item.price * 10  # تبدیل به ریال
+        }
+        invoice_list.append(invoice_item)
+    
+    # افزودن سطر جمع کل
+    total_item = {
+        "InvoiceNum": int(order.code),
+        "InvoiceDate": order.created_to_jalali().strftime('%Y/%m/%d'),
+        "AnbarId": 0,
+        "RelationId": 2,
+        "RelationType": 2,
+        "Quantity": 0,
+        "Bed": order.get_price_with_send() * 10,  # جمع کل به ریال
+        "Bes": 0
+    }
+    invoice_list.append(total_item)
+    
+    # ارسال به سرویس فاکتور
+    send_invoice_list(
+        order_code=order.code,
+        invoice_list=invoice_list,
+        desc="پرداخت اینترنتی",
+        name=order.user.get_full_name(),
+        mobile=order.address.phone_number,
+        postalcode=order.address.postal_code,
+        address=order.address.full_address(),
+        person="1"
+    )
+    # ===============     
+# =====================================================================================================
+# =====================================================================================================
+
+
+# class ProductFilter(django_filters.FilterSet):
+#     name = django_filters.CharFilter(field_name='name', lookup_expr='icontains')
+#     price_max = django_filters.NumberFilter(field_name='price', lookup_expr='lte', label='حداکثر قیمت')
+#
+#     order_by = django_filters.OrderingFilter(
+#         fields=(
+#             ('created', 'created'),
+#         )
+#     )
+#
+#     class Meta:
+#         model = Product
+#         fields = ['name', 'price_max']
+
+# FilterView
+# filterset_class = ProductFilter
+
+
+class OrderListView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = 'orders/my-orders.html'
+    context_object_name = 'orders'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return Order.objects.filter(user__exact=self.request.user).order_by('-id')
+
+
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    model = Order
+    template_name = 'orders/order-detail.html'
+    context_object_name = 'order'
+    pk_url_kwarg = 'order_id'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = self.get_object()
+        context['order_items'] = order.order_items.all()
+        context['total_price'] = order.get_price_with_send()  
+        context['delivery_date_jalali'] = jdatetime.date.fromgregorian(
+            date=order.delivery_date
+        ).strftime("%Y/%m/%d")
+        return context
+
+
+from django.shortcuts import get_object_or_404
+
+class CheckoutView(LoginRequiredMixin, CreateView):
+    model = Order
+    form_class = OrderForm
+    template_name = 'orders/checkout.html'
+    success_url = reverse_lazy('orders:order_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        site_settings = SiteSettings.objects.first()
+        random_code = generate_random_code()
+        order = form.save(commit=False)
+        form.is_valid()
+        cd = form.cleaned_data
+        pay_method = cd['pay_method']
+        delivery_date = cd['delivery_date']
+        time_slot = cd['time_slot']
+        delivery_type = cd['delivery_type']
+
+        cart, _ = Cart.objects.get_or_create(user=self.request.user)
+        cart_items = cart.cart_items.all()
+        if cart_items:
+
+            if pay_method == 'پرداخت درب منزل':
+                order.status = 'پرداخت درب منزل'
+
+            if time_slot:
+                order.time_slot = int(time_slot)
+
+            if delivery_date:
+                order.delivery_date = delivery_date
+
+            if delivery_type == 'ارسال فوری':
+                order.send_price = site_settings.fast_send_price
+                order.time_slot = int(order.created_datetime_to_jalali().strftime("%H"))
+                order.delivery_date = timezone.now().date()
+            else:
+                order.send_price = cart.send_price
+
+            order.user = self.request.user
+            order.code = random_code
+            order.delivery_type = delivery_type
+            order.save()
+
+            # ایجاد فاکتور پرداخت و ذخیره در دیتابیس
+            payment = Payment.objects.create(
+                token=random_code,  # مقدار شناسه پرداخت
+                amount=order.get_price_with_send(),  # مبلغ پرداختی
+                status="در انتظار پرداخت",  # وضعیت پرداخت
+                response={},  # مقدار پیش‌فرض برای JSONField
+            )
+            
+            # اتصال فاکتور به سفارش
+            order.payment = payment
+            order.save()
+
+            order.refresh_from_db()
+
+            for item in cart_items:
+                product = item.product
+                OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    product_name=product.name,
+                    product_code=product.code,
+                    product_unit_price=product.price,
+                    quantity=item.quantity,
+                    price=item.cart_item_discounted_price(),
+                )
+                item.delete()
+
+            key = {
+                'token1': order.code,
+                'token2': order.get_price_with_send(),
+            }
+            if order.status == "پرداخت درب منزل" or "درگاه پارسیان" or "درگاه بانک ملت":
+                try:
+                    send_invoice_as_pdf(order)
+                except Exception as e:
+                    print(str(e))
+                admin_pattern = '1a1de50e-05bc-400a-a915-53f603f364cf'
+                send_sms(admin_pattern, site_settings.admin_phone_number, key)
+                user_pattern = '61c9e3a2-ceea-4576-beb3-ed08bada6dc3'
+                send_sms(user_pattern, order.user.phone_number, key)
+
+            if pay_method == 'پرداخت درب منزل':
+                messages.success(self.request, 'سفارش شما با موفقیت ثبت شد!')
+                return redirect('orders:order_detail', order_id=order.id)
+            elif pay_method == 'درگاه پارسیان':
+                return redirect('orders:pay_order', order_id=order.id)
+            elif pay_method == 'درگاه بانک ملت':
+                return redirect('orders:mellat_pay_order', order_id=order.id)
+
+        return redirect('orders:order_list')
+
+    def form_invalid(self, form):
+        if 'address' in form.errors:
+            messages.error(self.request, 'لطفاً یک آدرس اضافه کنید!')
+        return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cart, _ = Cart.objects.get_or_create(user=self.request.user)
+        context['carts'] = cart.cart_items.all()
+        context['cart'] = cart
+        context['new_address_form'] = AddressForm()
+
+        today_jalali = jdatetime.date.today()
+        next_5_days = []
+        for i in range(5):
+            future_date = today_jalali + jdatetime.timedelta(days=i)
+            day_of_week = future_date.strftime('%A')
+            farsi_weekday = weekdays_farsi[day_of_week]
+            next_5_days.append({
+                'date': future_date,
+                'weekday': farsi_weekday,
+                'day_in_month': future_date.day
+            })
+
+        context['next_5_days'] = next_5_days
+        return context
+
+
+
+# class ApplyCouponView(LoginRequiredMixin, View):
+#     def post(self, request, *args, **kwargs):
+#         order_code = self.kwargs['order_code']
+#         order = get_object_or_404(Order, code__exact=order_code, user=request.user)
+#         if order.status != 'در انتظار پرداخت':
+#             messages.error(request, 'سفارش شما پرداخت شده است ، امکان اعمال کد تخفیف وجود ندارد')
+#             return redirect('orders:order_detail', code=order_code)
+#
+#         form = CouponForm(request.POST)
+#         if form.is_valid():
+#             coupon = form.cleaned_data['coupon_code']
+#             order.coupon = coupon
+#             order.save()
+#             return redirect('orders:order_detail', code=order_code)
+#         return render(request, 'orders/apply-coupon.html', {'form': form, 'order': order})
+
+
+class PayAtHomeView(RedirectView):
+    def get(self, request, *args, **kwargs):
+        order_id = self.kwargs['order_id']
+        order = get_object_or_404(Order, id=order_id)
+        order.status = 'پرداخت درب منزل'
+        order.save()
+        send_invoice_as_pdf(order)
+
+        # order.refresh_from_db()
+        messages.success(request, f'درخواست با موفقیت انجام شد!')
+
+        return redirect('orders:order_detail', order_id=order_id)
+
+
+class PayOrderView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        order_id = self.kwargs['order_id']
+        order = get_object_or_404(Order, id=order_id, user=request.user)
+        if order.status != 'در انتظار پرداخت':
+            messages.error(request, f'سفارش شما {order.status}.')
+            return redirect('orders:order_detail', order_code=order_id)
+
+        # ========================================================================================
+        callback_url = request.build_absolute_uri(reverse('orders:pay_call_back'))
+        # callback_url= f'https://abajstore.ir?order_code{}&token={}'
+        order_amount = order.get_price_with_send() * 10
+
+        # ==================================================
+        random_code = generate_random_code()
+        order.code = random_code
+        order.save()
+        order.refresh_from_db()
+        # ==================================================
+
+        try:
+            token = PaymentGateway.request_payment(int(random_code), int(order_amount), str(callback_url))
+            Payment.objects.create(token=token, bank='پارسیان')
+            return redirect(f"https://pec.shaparak.ir/NewIPG/?Token={token}")
+        except Exception as e:
+            messages.error(request, str(e))
+        return redirect('orders:pay_result', order_id=order_id)
+        # ========================================================================================
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PaymentCallbackView(View):
+    def post(self, request, *args, **kwargs):
+        referer = request.META.get('HTTP_REFERER')
+        allowed_referer = 'https://pec.shaparak.ir'
+
+        if referer and allowed_referer in referer:
+            form_data = request.POST
+
+            token = form_data.get('Token')
+            order_code = form_data.get('OrderId')
+            terminal_no = form_data.get('TerminalNo')
+            rrn = form_data.get('RRN')
+            status = form_data.get('status')
+            amount = form_data.get('Amount')
+            hash_card_no = form_data.get('HashCardNumber')
+            order = None
+            payment = None
+
+            if not all([token, status, order_code, rrn]):
+                messages.error(request, 'سفارش انجام نشد. (پارامتر های ورودی ناقص هستند!)')
+                return redirect('orders:order_list')
+
+            try:
+                print(f'Pay Order ====> {order_code}')
+                print(f'Pay Order ====> {token}')
+                order = Order.objects.get(code__exact=order_code)
+                payment = Payment.objects.get(token__exact=token)
+            except Order.DoesNotExist:
+                messages.error(request, 'متاسفانه خطایی در انجام سفارش رخ داد '
+                                        '، مبلغ پرداخت شده به حساب شما برگشت داده خواهد شد!')
+                return redirect('orders:order_list')
+
+            if status == '0' and rrn > '0' and order and payment:
+                # Payment was successful, verify it
+                if PaymentGateway.verify_payment(token):
+                    try:
+                        order.status = 'پرداخت شده'
+                        order.rrn = rrn
+                        order.payment = payment
+                        order.save()
+
+                        # payment.bank = 'پارسیان'
+                        payment.rrn = rrn
+                        payment.terminal_no = terminal_no
+                        payment.amount = amount
+                        payment.hash_card_no = hash_card_no
+                        payment.response_code = status
+                        payment.response = json.dumps(form_data)
+                        payment.status = 'پرداخت موفق'
+                        payment.save()
+
+                        create_invoice(order)
+                        send_invoice_as_pdf(order)
+
+                        messages.success(request, 'سفارش با موفقیت انجام شد!')
+                        return redirect('orders:pay_result', order_id=order.id)
+
+                    except Order.DoesNotExist:
+                        messages.error(request, 'سفارش یافت نشد!')
+                        return redirect('orders:order_list')
+
+                else:
+                    # Payment verification failed
+                    messages.error(request, 'خطا در اعتبارسنجی پرداخت!')
+                    return redirect('orders:pay_result', order_id=order.id)
+
+            else:
+                # Payment was not successful
+                messages.error(request, 'پرداخت ناموفق!')
+                return redirect('orders:pay_result', order_id=order.id)
+        else:
+            # Payment was not successful
+            messages.error(request, 'پرداخت ناموفق!')
+            return redirect('orders:order_list')
+
+
+class MellatPayOrderView(LoginRequiredMixin, View):
+    def get(self, request, order_id):
+        order = get_object_or_404(Order, id=order_id)
+        callback_url = request.build_absolute_uri(reverse('orders:mellat_pay_call_back'))
+
+        mellat_payment = Mellat(
+            callback_url=callback_url,
+            amount=int(order.get_price_with_send() * 10),
+            mobile_number=request.user.phone_number
+        )
+
+        mellat_payment.pay(order.code)
+
+        if mellat_payment.reference_number:
+            payment, create = Payment.objects.get_or_create(
+                token=mellat_payment.reference_number,
+                bank='ملت'
+            )
+            order.payment = payment
+            order.save()
+
+            return redirect(f"{mellat_payment.payment_url}?RefId={mellat_payment.reference_number}")
+        else:
+            messages.error(request, 'خطا در انجام عملیات!')
+            return redirect('orders:pay_result', order_id=order_id)
+
+
+class MellatPaymentCallbackView(View):
+    def post(self, request):
+        post = request.POST
+        reference_number = post.get('RefId')
+        sale_reference_id = post.get('SaleReferenceId', "1")
+        payment = get_object_or_404(Payment, token=reference_number)
+        order = get_object_or_404(Order, payment=payment)
+        callback_url = request.build_absolute_uri(reverse('orders:order_result', kwargs={'order_id': order.id}))
+        amount = int(order.get_price_with_send() * 10)
+
+        mellat_payment = Mellat(
+            callback_url=callback_url,
+            amount=amount,
+        )
+        mellat_payment.reference_number = reference_number
+        mellat_payment.sale_reference_id = sale_reference_id
+
+        json_response = json.dumps(dict(zip(post.keys(), post.values())))
+        payment.response = json_response
+        mellat_payment.verify()
+
+        if mellat_payment.transaction_status_text == 'completed':
+            # payment.bank = 'ملت'
+            payment.rrn = mellat_payment.sale_reference_id
+            payment.terminal_no = mellat_payment.terminal_code
+            payment.amount = amount
+            payment.response_code = 0
+            payment.status = 'پرداخت موفق'
+            order.status = 'پرداخت شده'
+            payment.save()
+            order.save()
+
+            create_invoice(order)
+            send_invoice_as_pdf(order)
+
+            return redirect('orders:pay_result', order_id=order.id)
+
+        else:
+            payment.status = 'پرداخت ناموفق'
+            payment.save()
+            return redirect('orders:pay_result', order_id=order.id)
+
+
+class PayOrderResultView(LoginRequiredMixin, TemplateView):
+    template_name = 'orders/pay-result.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order_id = self.kwargs['order_id']
+        order = get_object_or_404(Order, id=order_id, user=self.request.user)
+        context.update({
+            'order': order,
+            'order_items': order.order_items.all(),
+            'total_price': order.get_price_with_send(),
+            'payment_date': order.payment.created_datetime_to_jalali().strftime("%Y/%m/%d %H:%M")
+        })
+        return context
+
+
+class GetOrderLocation(TemplateView):
+    template_name = 'orders/order-location.html'
+
+    def get_object(self, order_id):
+        return get_object_or_404(Order, id=order_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order_id = self.kwargs['order_id']
+        order = self.get_object(order_id)
+        location = order.address.location
+        if location is not None:
+            location = json.loads(location)
+            
+        context['location'] = location
+        return context
+

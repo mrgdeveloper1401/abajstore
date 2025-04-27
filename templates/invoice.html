@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fa-ir">
+<head>
+    <style>
+        @page {
+            {#size: 100mm auto; #}
+            size: 100mm;
+            margin: 5mm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+        }
+
+        .header, .footer {
+            text-align: center;
+            margin-bottom: 5mm;
+        }
+
+        .details, .products, .total, .description, .address {
+            margin-bottom: 5mm;
+        }
+
+        .products table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9pt;
+        }
+
+        .products table, .products th, .products td {
+            border: 1px solid #ddd;
+        }
+
+        .products th, .products td {
+            padding: 2mm;
+            text-align: left;
+        }
+
+        .products th {
+            background-color: #f2f2f2;
+            font-size: 8pt;
+        }
+
+        .total {
+            font-weight: bold;
+            font-size: 11pt;
+        }
+
+        .footer {
+            font-size: 9pt;
+        }
+    </style>
+    <title></title>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ title }}</h1>
+        </div>
+        <div class="details">
+            <p><strong>Date and Time:</strong> {{ date_time }}</p>
+            <p><strong>Order Number:</strong> {{ order_number }}</p>
+            <p><strong>Buyer:</strong> {{ buyer }}</p>
+            <p><strong>Status:</strong> {{ status }}</p>
+        </div>
+        <div class="products">
+            <h2>Products</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Serial</th>
+                        <th>Product Name</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Total Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in products %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.unit_price }}</td>
+                        <td>{{ item.total_price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="total">
+            <p><strong>Total Amount:</strong> {{ total_amount }}</p>
+        </div>
+        <div class="description">
+            <p><strong>Description:</strong> {{ description }}</p>
+        </div>
+        <div class="address">
+            <p><strong>Address:</strong> {{ address }}</p>
+        </div>
+        <div class="footer">
+            <p>Thank you for your business!</p>
+        </div>
+    </div>
+</body>
+</html>

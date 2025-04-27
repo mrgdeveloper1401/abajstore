@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+
+{% block title %} وضعیت سفارش {% endblock %}
+
+
+
+{% block style %} {% endblock %}
+
+
+
+{% block content %}
+    
+    
+    
+    <main class="lg:pt-[140px]">
+      <section
+        id="hiddenContent"
+        class="bg-lowOpacityColorBg items-start hidden fixed z-[9] top-0 right-0 w-full h-screen"
+      ></section>
+      <section>
+        <div
+          class="container flex gap-2 text-lowGray text-[12px] text-nowrap overflow-auto"
+        >
+          <a href="#">صفحه اصلی</a>
+          <span class="select-none">/</span>
+          <p>تسویه حساب</p>
+        </div>
+      </section>
+      <section>
+          
+          
+        <div class="container boxBorder rounded-md space-y-2">
+        
+        
+            {% if order.status == 'لغو شده' or order.status == 'در انتظار پرداخت' %}
+          <h1 class="text-redColor sm:text-2xl text-xl">
+            متاسفانه پرداخت شما ناموفق بود!
+          </h1>
+{#          <p class="text-sm text-lowGray">#}
+{#            كاربر از انجام تراكنش منصرف شده است#}
+{#          </p>#}
+            {% else %}
+          <h1 class="text-lowGreenColor sm:text-2xl text-xl">
+             پرداخت شما با موفقیت انجام شد!
+          </h1>
+            {% endif %}
+
+        
+          <p>شماره سفارش : <span>{{ order.code }}</span></p>
+          <p>شماره مرجع : <span>{{ order.rrn|default_if_none:'-' }}</span></p>
+        
+        {% if order.send_price %}
+          <p>هزینه ارسال : <span>{{ order.send_price }} تومان </span></p>
+        {% else %}
+          <p>هزینه ارسال : <span> رایگان </span></p>
+        {% endif %}
+          <p>مبلغ کل (با احتساب هزینه ارسال) : <span>{{ order.get_price_with_send }} تومان </span></p>
+            
+            
+        </div>
+      </section>
+    </main>
+    
+    
+ {% endblock %}
+
+
+
+  {% block scripts %} {% endblock %}
+
+

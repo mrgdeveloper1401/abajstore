@@ -1,0 +1,64 @@
+{% extends 'accounts_base.html' %}
+{% load static %}
+
+
+    {% block title %} ورود {% endblock %}
+
+          {% block form %}
+
+      <section>
+        <form method="post" class="flex flex-col gap-5">
+            {% csrf_token %}
+          <h1 class="text-xl text-lowGray">ورود</h1>
+          <div>
+            <label for="userName" class="text-sm text-lowGray">
+               شماره موبایل خود را وارد کنید
+            </label>
+              {{ form.username }}
+              {{ form.username.errors }}
+          </div>
+          <div>
+            <label for="userPass" class="text-sm text-lowGray">
+               رمز خود را وارد کنید
+            </label>
+              {{ form.password }}
+              {{ form.password.errors }}
+          </div>
+              {{ form.non_field_errors }}
+          <button type="submit"
+            class="bg-redColor opacity-80 hover:opacity-100 transition-opacity duration-300 text-whiteColor py-3 w-full rounded-md"
+          >
+            ورود
+          </button>
+        </form>
+      </section>
+      <section>
+        <p class="text-[14px] text-center">
+           حساب ندارید؟
+          <a href="{% url 'auth:register' %}" class="text-linkColor"> از اینجا وارد شوید </a>
+        </p>
+          <p class="text-[14px] text-center">
+          <a href="{% url 'auth:forget_password' %}" class="text-linkColor"> رمز عبور خود را فراموش کرده ام </a>
+        </p>
+      </section>
+    {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

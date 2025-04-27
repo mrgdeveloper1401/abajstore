@@ -1,0 +1,4 @@
+baradar file haye static o venv o statifiles o media o yek seri dige ro
+gozashtam tooye .gitignore
+in ha rooye git zakhire nemishe
+havaset bashe

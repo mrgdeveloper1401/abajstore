@@ -1,0 +1,207 @@
+{% load static %}
+
+    <footer class="divide-y-2 divide-submitPageColorBorderLowBlack">
+      <section class="border-t border-submitPageColorBorderLowBlack">
+        <div class="2xl:container p-4">
+          <div
+            class="grid lg:grid-cols-[repeat(auto-fit,minmax(100px,150px))] grid-cols-2 grid-rows-[100px] justify-around items-center gap-6"
+          >
+            <div class="flex items-center flex-col">
+              <img
+                loading="lazy"
+                class="h-[60px]"
+                src="{% static 'assets/images/8f570b58.png' %}"
+                alt="تحویل پیک"
+              />
+              <span>تحویل پیک</span>
+            </div>
+            <div class="flex items-center flex-col">
+              <img
+                loading="lazy"
+                class="h-[60px]"
+                src="{% static 'assets/images/a9286d2f.png' %}"
+                alt="پشتیبانی همه روزه"
+              />
+              <span>پشتیبانی همه روزه</span>
+            </div>
+            <div class="flex items-center flex-col">
+              <img
+                loading="lazy"
+                class="h-[60px]"
+                src="{% static 'assets/images/22414818.png' %}"
+                alt="پرداخت سریع و راحت"
+              />
+              <span>پرداخت سریع و راحت</span>
+            </div>
+            <div class="flex items-center flex-col">
+              <img
+                loading="lazy"
+                class="h-[60px]"
+                src="{% static 'assets/images/fdb293e6.png' %}"
+                alt="ضمانت اصل بودن کالا"
+              />
+              <span>ضمانت اصل بودن کالا</span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="2xl:container p-4">
+          <div
+            class="sm:flex grid grid-cols-2 gap-10 px-2 justify-around scale-90"
+          >
+            <div class="text-lowGray">
+              <p class="text-blackColor">آباج مارکت</p>
+              <ul class="space-y-2">
+                  
+                <li>
+                  <a href="#" class="hover:text-blackColor text-sm"
+                    >فرصت‌های شغلی</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="hover:text-blackColor text-sm"
+                    >تماس با ما</a
+                  >
+                </li>
+                <li>
+                  <a href="#" class="hover:text-blackColor text-sm"
+                    >درباره ما</a
+                  >
+                </li>
+                  
+              </ul>
+            </div>
+            <div class="text-lowGray">
+              <p class="text-blackColor">خدمات مشتریان</p>
+              <ul class="space-y-2">
+              
+                  {% for help in addresses %}
+                    <li>
+                      <a href="{{ help.value }}" class="hover:text-blackColor text-sm"
+                        >{{ help.name }}</a
+                      >
+                    </li>
+                  {% endfor %}
+              
+              </ul>
+            </div>
+            <div class="text-lowGray">
+              <p class="text-blackColor">راهنمای خرید</p>
+              <ul class="space-y-2">
+              
+                  {% for page in links %}
+                    <li>
+                      <a href="{{ page.value }}" class="hover:text-blackColor text-sm"
+                        >{{ page.name }}</a
+                      >
+                    </li>
+                 {% endfor%} 
+              
+              </ul>
+            </div>
+            <div class="flex flex-col justify-start">
+              <p class="text-blackColor">با ما همراه باشید</p>
+            
+                {% for social in phones %}
+                  <a href="{{ social.value }}">
+                    <i
+                      class="fab {{ social.name }} text-lowGray text-4xl"
+                      aria-hidden="true"
+                    ></i>
+                  </a>
+                {% endfor %}
+            
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div
+          class="2xl:container p-4 flex sm:flex-row flex-col justify-between gap-2"
+        >
+          <div class="basis-[60%]">
+        <a href="{% url 'products:home' %}" class="block w-[120px]">
+              <img
+                src="{% static 'assets/images/logo.png' %}"
+                class="w-full"
+                alt="عکس"
+              />
+            </a>
+            <p class="text-lowGray text-sm">
+آباج مارکت جهت رفاه حال مشتریان عزیز خود اقدام به راه اندازی سیستم ثبت سفارش به صورت آنلاین کرده است که در همه وقت از شبانه روز در دسترس شما عزیزان خواهد بود . آدرس : یزد.خیابان چمران.آباج مارکت
+            </p>
+          </div>
+          <div class="basis-[40%] flex justify-center gap-10 scale-75">
+
+              <a class="block boxBorder" referrerpolicy='origin' target='_blank' 
+                 href='https://trustseal.enamad.ir/?id=216288&Code=LfshiLhreecMKVliqrbq'>
+                  <img referrerpolicy='origin' 
+                       class="w-[110px]"
+                       loading="lazy"
+                       src='https://trustseal.enamad.ir/logo.aspx?id=216288&Code=LfshiLhreecMKVliqrbq' 
+                       alt='e-namad' style='cursor:pointer' Code='LfshiLhreecMKVliqrbq'>
+              </a>
+              
+              
+              
+              
+{#            <a href="#" class="block boxBorder">#}
+{#              <img#}
+{#                loading="lazy"#}
+{#                src="{% static 'assets/images/footerimage2.png' %}"#}
+{#                class="w-[110px]"#}
+{#                alt="فوتر"#}
+{#              />#}
+{#            </a>#}
+{#            <a href="#" class="block boxBorder">#}
+{#              <img#}
+{#                loading="lazy"#}
+{#                src="{% static 'assets/images/654654654.svg' %}"#}
+{#                class="w-[110px]"#}
+{#                alt="فوتر"#}
+{#              />#}
+{#            </a>#}
+              
+              
+              
+          </div>
+        </div>
+      </section>
+      <section>
+        <div
+          class="2xl:container p-4 py-2 flex gap-2 justify-center text-[12px] text-lowGray"
+        >
+          <p>
+            © تمامی حقوق این سایت متعلق به آباج استور می باشد. | طراحی و کد
+            نویسی: پَتِرن
+          </p>
+        </div>
+      </section>
+      <section>
+        <div
+          class="2xl:container p-4 flex flex-col gap-4 items-center justify-center"
+        >
+          <a
+            class="flex flex-col gap-4 items-center justify-center"
+            href="http://patterndp.ir"
+            target="_blank"
+          >
+            <img
+              src="{% static 'assets/images/logo-pattern.png' %}"
+              class="max-w-[150px]"
+              alt="گروه پترن"
+            />
+          </a>
+        </div>
+      </section>
+      <section>
+        <button
+          id="scrollTop"
+          class="w-[30px] h-[30px] bg-redColor opacity-80 text-whiteColor p-5 rounded z-[9] hover:opacity-100 flex justify-center items-center fixed bottom-[30px] left-[20px]"
+        >
+          <i class="fa fa-arrow-up"></i>
+        </button>
+      </section>
+    </footer>
